@@ -1,30 +1,60 @@
-import React, { useEffect } from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+
+import getData from "../src/getData";
+
 import './App.css';
-import getData from './getData';
+
+const DataToComponent = {
+  RowChildren: ({ root }) => (
+    <div
+      className="row-children"
+    >
+      {root.children &&
+        <Blocks
+          root={root.children}
+        />}
+    </div>
+  ),
+  ColumnChildren: ({ root }) => (
+    <div
+      className="column-children"
+    >
+      {root.children &&
+        <Blocks
+          root={root.children}
+        />}
+    </div>
+  ),
+  Text: () => (
+    <div>
+      {"Hello"}
+    </div>
+  )
+};
+
+const Blocks = ({ root, params }) => (
+  root.map(child => 
+    DataToComponent[child.type]({ root: child })
+  )
+);
 
 function App() {
-  useEffect(() => {
-    getData();
-  });
+  const [data, setData] = useState(null);
+
+  useEffect(() =>
+    (async () =>
+      setData(await getData()))
+    ()
+  , []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {data &&
+        <Blocks
+          root={data.pages}
+        />
+      }
+    </>
   );
 }
 

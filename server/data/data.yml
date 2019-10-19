@@ -1,0 +1,10 @@
+pages: 
+  # Page 1
+  - type: RowChildren
+    children:
+      - type: Text
+      - type: Text
+      - type: ColumnChildren
+        children:
+          - type: Text
+          - type: Text
