@@ -12,6 +12,7 @@
 .footer {
   top: auto;
   bottom: 0;
+  position: absolute !important;
 }
 
 .horizontal-center {

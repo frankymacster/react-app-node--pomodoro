@@ -19,11 +19,21 @@
       route: "/projects"
       children:
         - type: MediaCard
-          title: Project1
+          title: Stingray Hackathon WebVR
+          codelink: https://github.com/frankymacster/vr-music-player
+          demolink: https://stingray-hackathon-webvr.glitch.me
         - type: MediaCard
-          title: Project2
-          link: https://stingray-hackathon-webvr.glitch.me
+          title: Graph Proof Visualizer
+          codelink: https://github.com/frankymacster/p5js-graph
         - type: MediaCard
+          title: ECS Panoramic Viewer
+          codelink: https://github.com/frankymacster/ECS-Panoramic-Viewer
+        - type: MediaCard
+          title: Graph BFS visualizer
+          codelink: https://github.com/frankymacster/cytoscape-bfs
+        - type: MediaCard
+          title: Graph Drawer
+          codelink: https://github.com/frankymacster/react-graph
 - type: Footer
   children:
     - type: Link

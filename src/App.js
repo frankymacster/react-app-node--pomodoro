@@ -62,22 +62,10 @@ const DataToComponent = {
     />
   ),
   Footer: ({ root, key, params }) => {
-    const useStyles = makeStyles((theme) =>
-      createStyles({
-        appBar: {
-          top: "auto",
-          bottom: 0,
-          position: "absolute"
-        }
-      })
-    );
-
-    const classes = useStyles();
-
     return (
       <AppBar
         position="absolute"
-        className={classes.appBar}
+        className="footer"
         showMenuIconButton={false}
       >
         <Toolbar>
@@ -125,7 +113,7 @@ const DataToComponent = {
       {root.text}
     </div>
   ),
-  MediaCard: ({ root: { title, text } }) => (
+  MediaCard: ({ root, root: { title, text } }) => (
     <Card>
       <CardActionArea>
         <CardMedia
@@ -142,12 +130,24 @@ const DataToComponent = {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary">
-          Share
-        </Button>
-        <Button size="small" color="primary">
-          Learn More
-        </Button>
+        {root.codelink &&
+          <Button
+            size="small"
+            color="primary"
+            target="_blank"
+            href={root.codelink}
+          >
+            Code
+          </Button>}
+        {root.demolink &&
+          <Button
+            size="small"
+            color="primary"
+            target="_blank"
+            href={root.demolink}
+          >
+            Demo
+          </Button>}
       </CardActions>
     </Card>
   ),
