@@ -5,8 +5,8 @@ import handlePromise from "./handlePromise";
  *
  * @return {Promise<Data>}
  */
-export default async function getData() {
-  const [data, dataErr] = await handlePromise(fetch(`/api/data`));
+export default async function getData(url) {
+  const [data, dataErr] = await handlePromise(fetch(url));
 
   if (dataErr) {
     const [info, infoErr] = await handlePromise(fetch(`/api/info`));

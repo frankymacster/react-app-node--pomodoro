@@ -1,10 +1,37 @@
-pages: 
-  # Page 1
-  - type: RowChildren
-    children:
-      - type: MediaCard
-      - type: Text
-      - type: ColumnChildren
-        children:
-          - type: MediaCard
-          - type: MediaCard
+- type: Pages
+  children:
+    - type: RowChildren
+      align: center
+      title: François Sunatori
+      route: "/about"
+      children:
+        - type: MediaCard
+          text: I'm a full stack web developer.
+        - type: MediaCard
+          title: Interests
+          text: I enjoy working on challenging problems. I like problems involving math and functional programming.
+        - type: Button
+          text: Click here
+          link: http://www.google.com/
+    - type: RowChildren
+      align: center
+      title: "Projects"
+      route: "/projects"
+      children:
+        - type: MediaCard
+          title: Project1
+        - type: MediaCard
+          title: Project2
+          link: https://stingray-hackathon-webvr.glitch.me
+        - type: MediaCard
+- type: Footer
+  children:
+    - type: Link
+      href: https://www.linkedin.com/in/fran%C3%A7ois-sunatori-52a278a7
+      text: LinkedIn
+    - type: Link
+      href: https://github.com/frankymacster
+      text: GitHub
+    - type: Link
+      href: https://codepen.io/fsuna064/pens/public?grid_type=list
+      text: CodePen
