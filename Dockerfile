@@ -13,6 +13,7 @@ FROM dev as build
 
 COPY package* ./
 RUN npm i
+RUN npm i material-ui@next
 
 COPY public public
 COPY server server
