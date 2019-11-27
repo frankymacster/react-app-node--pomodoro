@@ -1,18 +1,47 @@
 .App {
   text-align: center;
+  background-image:
+    linear-gradient(
+      to right, 
+      red, #f06d06
+    );
+  height: 100%;
+  overflow: scroll;
 }
 
-.row-children {
-  display: flex;
-  flex-direction: row;
-  max-width: 1300px;
-  margin: 0 auto;
+@media only screen and (min-width: 720px) {
+  .row-children {
+    display: flex;
+    flex-direction: row;
+    max-width: 1300px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    grid-gap: 10px;
+  }
+}
+
+.container {
+  height: 100%;
+}
+
+.tab {
+  height: 100%;
 }
 
 .footer {
   top: auto;
   bottom: 0;
   position: absolute !important;
+}
+
+.media-card {
+  margin: 20px;
+}
+
+.link {
+  margin: 15px;
 }
 
 .horizontal-center {

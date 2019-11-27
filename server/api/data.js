@@ -6,7 +6,7 @@ const yaml = require("js-yaml");
 module.exports = {
   get: async (req, res) => {
     try {
-      const dataPath = path.join(__dirname, "../data/data.yml");
+      const dataPath = path.join(__dirname, "../data/layout.yml");
       const dataStr = await promisify(fs.readFile)(dataPath, "utf8");
       const data = yaml.load(dataStr);
       res.json(data);

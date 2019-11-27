@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { Switch, Route, Link, BrowserRouter } from "react-router-dom";
@@ -18,6 +17,8 @@ import Typography from '@material-ui/core/Typography';
 import Toolbar from "@material-ui/core/Toolbar";
 import classList from "./classList";
 import Blocks from "./Blocks";
+import Counter from "./Counter";
+import Input from "./Input";
 
 import './App.css';
 
@@ -51,6 +52,7 @@ const DataToComponent = {
         >          
           {root.children.map(page => (
             <Tab
+              className="tab"
               label={page.title}
               component={Link}
               to={page.route}
@@ -114,7 +116,7 @@ const DataToComponent = {
     </div>
   ),
   MediaCard: ({ root, root: { title, text } }) => (
-    <Card>
+    <Card className="media-card">
       <CardActionArea>
         <CardMedia
           image="/static/images/cards/contemplative-reptile.jpg"
@@ -163,22 +165,23 @@ const DataToComponent = {
   ),
   Link: ({ root }) => (
     <Link
+      className="link"
       target="_blank"
-      href={root.href}
+      href={root.link}
     >
       {root.text}
     </Link>
   ),
+  Input: ({ root }) => <Input />,
+  Counter: ({ root: { initialCount } }) => <Counter initialCount={initialCount} />
 };
 
 function App() {
   const [data, setData] = useState(null);
-  const [catData, setCatData] = useState(null);
 
   useEffect(() =>
     (async () => {
       setData(await getData("/api/data"));
-      setCatData(await getData("https://api.thecatapi.com/v1/images/search"));
     })
     ()
   , []);

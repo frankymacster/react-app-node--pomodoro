@@ -1,6 +1,6 @@
 - type: Pages
   children:
-    - type: RowChildren
+    - type: ColumnChildren
       align: center
       title: François Sunatori
       route: "/about"
@@ -8,13 +8,17 @@
         - type: MediaCard
           text: I'm a full stack web developer.
         - type: MediaCard
+          text: 
+        - type: MediaCard
           title: Interests
           text: I enjoy working on challenging problems. I like problems involving math and functional programming.
         - type: Button
           text: Click here
           link: http://www.google.com/
+        - type: Button
+          text: Click here
+          link: http://www.facebook.com/
     - type: RowChildren
-      align: center
       title: "Projects"
       route: "/projects"
       children:
@@ -28,20 +32,23 @@
         - type: MediaCard
           title: ECS Panoramic Viewer
           codelink: https://github.com/frankymacster/ECS-Panoramic-Viewer
-        - type: MediaCard
-          title: Graph BFS visualizer
-          codelink: https://github.com/frankymacster/cytoscape-bfs
-        - type: MediaCard
-          title: Graph Drawer
-          codelink: https://github.com/frankymacster/react-graph
+        - type: Counter
+          initialCount: 0
+        - type: Text
+          text: (state.text)
+        - type: Input
+          value: (state.text)
 - type: Footer
   children:
     - type: Link
-      href: https://www.linkedin.com/in/fran%C3%A7ois-sunatori-52a278a7
+      link: https://www.linkedin.com/in/fran%C3%A7ois-sunatori-52a278a7
       text: LinkedIn
     - type: Link
-      href: https://github.com/frankymacster
+      link: https://github.com/frankymacster
       text: GitHub
     - type: Link
-      href: https://codepen.io/fsuna064/pens/public?grid_type=list
+      link: https://gist.github.com/frankymacster
+      text: gists
+    - type: Link
+      link: https://codepen.io/fsuna064/pens/public?grid_type=list
       text: CodePen
