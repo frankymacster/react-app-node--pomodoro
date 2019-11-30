@@ -1,11 +1,19 @@
-const Blocks = ({ root, dataToComponent, params }) => (
+import { connect } from "react-redux";
+
+const Blocks = ({ root, dataToComponent, params, state, dispatch }) => (
   root.map((child, index) => 
     dataToComponent[child.type]({
       root: child,
       key: index,
-      params
+      params: {
+        ...params,
+        state,
+        dispatch
+      }
     })
   )
 );
 
-export default Blocks;
+export default connect(
+  state => ({ state })
+)(Blocks);

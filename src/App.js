@@ -18,7 +18,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import classList from "./classList";
 import Blocks from "./Blocks";
 import Counter from "./Counter";
-import Input from "./Input";
 
 import './App.css';
 
@@ -172,8 +171,19 @@ const DataToComponent = {
       {root.text}
     </Link>
   ),
-  Input: ({ root }) => <Input />,
-  Counter: ({ root: { initialCount } }) => <Counter initialCount={initialCount} />
+  Input: ({ root, params: { state, dispatch } }) => (
+    <input
+      value={state.text}
+      type="text"
+      onChange={e => dispatch({ type: "setText", text: parseInt(e.target.value) })}
+    />
+  ),
+  Counter: ({ root: { initialCount }, params: { state, dispatch } }) => (
+    <Counter
+      initialCount={state.text}
+      onChange={s => dispatch({ type: "setText", text: s.count })}
+    />
+  )
 };
 
 function App() {
