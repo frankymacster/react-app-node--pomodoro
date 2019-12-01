@@ -7,6 +7,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import createReducer from "./createReducer";
 
 const TodoForm = ({ saveTodo }) => {
@@ -33,7 +34,10 @@ const TodoForm = ({ saveTodo }) => {
       onSubmit={e => {
         e.preventDefault();
 
-        saveTodo(state.value);
+        saveTodo({
+          text: state.value,
+          editing: false,
+        });
         dispatch({ type: "reset" });
       }}
     >
@@ -41,22 +45,41 @@ const TodoForm = ({ saveTodo }) => {
         variant="outlined"
         placeholder="Add todo"
         margin="normal"
-        onChange={e => dispatch({ type: "setValue", value: e.target.value })}
+        onChange={e => dispatch({
+          type: "setValue",
+          value: e.target.value
+        })}
         value={state.value}
       />
     </form>
   );
 };
 
-const TodoList = ({ todos, deleteTodo }) => (
+const TodoList = ({ todos, deleteTodo, editTodo, setNewText }) => (
   <List>
     {todos.map((todo, index) => (
       <ListItem key={index.toString()} dense button>
         <Checkbox tabIndex={-1} disableRipple />
-        <ListItemText primary={todo} />
+        {
+          todo.editing
+            ? <input
+                value={todo.text}
+                onChange={e => setNewText(index, e.target.value)}
+              />
+            : <ListItemText primary={todo.text} />
+        }
+
         <ListItemSecondaryAction>
           <IconButton
             aria-label="Delete"
+            onClick={() => {
+              editTodo(index);
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            aria-label="Edit"
             onClick={() => {
               deleteTodo(index);
             }}
@@ -75,14 +98,48 @@ const TodoApp = () => {
   const reducer = createReducer(
     initialState,
     {
-      addTodo: (state, { text }) => ({
+      addTodo: (state, { todo }) => ({
         ...state,
-        todos: [...state.todos, text]
+        todos: [...state.todos, todo]
       }),
+      editTodo: (state, { todoIndex }) => {
+        const newTodos = Object.assign(
+          [],
+          state.todos,
+          {
+            [todoIndex]: {
+              ...state.todos[todoIndex],
+              editing: !state.todos[todoIndex].editing
+            }
+          }
+        );
+
+        return {
+          ...state,
+          todos: newTodos
+        }
+      },
       deleteTodo: (state, { todoIndex }) => ({
         ...state,
         todos: state.todos.filter((_, index) => index !== todoIndex)
-      })
+      }),
+      setNewText: (state, { todoIndex, text }) => {
+        const newTodos = Object.assign(
+          [],
+          state.todos,
+          {
+            [todoIndex]: {
+              ...state.todos[todoIndex],
+              text
+            }
+          }
+        );
+
+        return {
+          ...state,
+          todos: newTodos
+        }
+      }
     }
   );
 
@@ -91,16 +148,12 @@ const TodoApp = () => {
   return (
     <>
       <TodoForm
-        saveTodo={text => {
-          const trimmedText = text.trim();
-
-          if (trimmedText.length > 0) {
-            dispatch({
-              type: "addTodo",
-              text: trimmedText
-            })
-          }
-        }}
+        saveTodo={todo =>
+          dispatch({
+            type: "addTodo",
+            todo
+          })
+        }
       />
 
       <TodoList
@@ -109,6 +162,19 @@ const TodoApp = () => {
           dispatch({
             type: "deleteTodo",
             todoIndex
+          })
+        }
+        editTodo={todoIndex =>
+          dispatch({
+            type: "editTodo",
+            todoIndex
+          })
+        }
+        setNewText={(todoIndex, text) =>
+          dispatch({
+            type: "setNewText",
+            todoIndex,
+            text
           })
         }
       />
