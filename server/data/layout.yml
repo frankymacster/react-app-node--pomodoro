@@ -35,6 +35,7 @@
         - type: Counter
           initialCount: 0
         - type: TodoList
+        - type: Pomodoro
         - type: Text
           text: (state.text)
         - type: Input

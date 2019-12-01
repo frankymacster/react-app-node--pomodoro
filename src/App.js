@@ -19,6 +19,7 @@ import classList from "./classList";
 import Blocks from "./Blocks";
 import Counter from "./Counter";
 import TodoApp from "./TodoApp";
+import Pomodoro from "./Pomodoro";
 
 import './App.css';
 
@@ -192,7 +193,10 @@ const DataToComponent = {
     />
   ),
   TodoList: ({ params: { state, dispatch } }) => (
-    <TodoApp></TodoApp>
+    <TodoApp />
+  ),
+  Pomodoro: ({ params: { state, dispatch } }) => (
+    <Pomodoro />
   )
 };
 
