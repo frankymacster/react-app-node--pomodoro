@@ -34,7 +34,7 @@ function Pomodoro({ onDone }) {
   }, [state.timerStarted]);
 
   useEffect(() => {
-    if (state.count === 5) {
+    if (state.count > 0 && state.count % 5 === 0) {
       dispatch({ type: "setTimerStarted" });
       onDone(state);
     }

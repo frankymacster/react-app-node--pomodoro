@@ -32,14 +32,10 @@
         - type: MediaCard
           title: ECS Panoramic Viewer
           codelink: https://github.com/frankymacster/ECS-Panoramic-Viewer
-        - type: Counter
-          initialCount: 0
-        - type: TodoList
-        - type: Pomodoro
-        - type: Text
-          text: (state.text)
-        - type: Input
-          value: (state.text)
+        - type: ColumnChildren
+          children:
+            - type: Pomodoro
+            - type: TodoList
 - type: Footer
   children:
     - type: Link
