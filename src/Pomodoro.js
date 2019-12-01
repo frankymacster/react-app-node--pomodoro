@@ -33,6 +33,12 @@ function Pomodoro() {
     return () => clearInterval(interval);
   }, [state.timerStarted]);
 
+  useEffect(() => {
+    if (state.count === 5) {
+      dispatch({ type: "setTimerStarted" });
+    }
+  }, [state.count]);
+
   return (
     <>
       <h1>{state.count}</h1>
