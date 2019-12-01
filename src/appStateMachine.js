@@ -1,7 +1,7 @@
 const initialState = { text: 0 };
 
 const actions = {
-  setText: (state, action) => ({ text: action.text })
+  setText: (state, action) => ({ ...state, text: action.text })
 };
 
 export {

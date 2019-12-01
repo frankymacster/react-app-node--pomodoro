@@ -18,6 +18,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import classList from "./classList";
 import Blocks from "./Blocks";
 import Counter from "./Counter";
+import TodoApp from "./TodoApp";
 
 import './App.css';
 
@@ -175,14 +176,23 @@ const DataToComponent = {
     <input
       value={state.text}
       type="text"
-      onChange={e => dispatch({ type: "setText", text: parseInt(e.target.value) })}
+      onChange={e => dispatch({
+        type: "setText",
+        text: parseInt(e.target.value)
+      })}
     />
   ),
   Counter: ({ root: { initialCount }, params: { state, dispatch } }) => (
     <Counter
       initialCount={state.text}
-      onChange={s => dispatch({ type: "setText", text: s.count })}
+      onChange={s => dispatch({
+        type: "setText",
+        text: s.count
+      })}
     />
+  ),
+  TodoList: ({ params: { state, dispatch } }) => (
+    <TodoApp></TodoApp>
   )
 };
 
