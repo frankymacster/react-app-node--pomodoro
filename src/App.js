@@ -193,10 +193,16 @@ const DataToComponent = {
     />
   ),
   TodoList: ({ params: { state, dispatch } }) => (
-    <TodoApp />
+    <TodoApp
+      setTopTodoAsDone={state.setTopTodoAsDone}
+    />
   ),
   Pomodoro: ({ params: { state, dispatch } }) => (
-    <Pomodoro />
+    <Pomodoro
+      onDone={s => dispatch({
+        type: "setTopTodoAsDone"
+      })}
+    />
   )
 };
 

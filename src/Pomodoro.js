@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect } from "react";
 import createReducer from "./createReducer";
 
-function Pomodoro() {
+function Pomodoro({ onDone }) {
   const initialState = {
     count: 0,
     timerStarted: false,
@@ -36,6 +36,7 @@ function Pomodoro() {
   useEffect(() => {
     if (state.count === 5) {
       dispatch({ type: "setTimerStarted" });
+      onDone(state);
     }
   }, [state.count]);
 

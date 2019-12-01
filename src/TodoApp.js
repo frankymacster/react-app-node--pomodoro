@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -37,6 +37,7 @@ const TodoForm = ({ saveTodo }) => {
         saveTodo({
           text: state.value,
           editing: false,
+          done: false,
         });
         dispatch({ type: "reset" });
       }}
@@ -59,7 +60,11 @@ const TodoList = ({ todos, deleteTodo, editTodo, setNewText }) => (
   <List>
     {todos.map((todo, index) => (
       <ListItem key={index.toString()} dense button>
-        <Checkbox tabIndex={-1} disableRipple />
+        <Checkbox
+          tabIndex={-1}
+          disableRipple
+          checked={todo.done}
+        />
         {
           todo.editing
             ? <input
@@ -92,7 +97,15 @@ const TodoList = ({ todos, deleteTodo, editTodo, setNewText }) => (
   </List>
 );
 
-const TodoApp = () => {
+const TodoApp = ({ setTopTodoAsDone }) => {
+  useEffect(() =>
+    dispatch({
+      type: "setTopTodoAsDone",
+      setTopTodoAsDone
+    }),
+    [setTopTodoAsDone]
+  );
+
   const initialState = { todos: [] };
 
   const reducer = createReducer(
@@ -134,6 +147,23 @@ const TodoApp = () => {
             }
           }
         );
+
+        return {
+          ...state,
+          todos: newTodos
+        }
+      },
+      setTopTodoAsDone: (state, action) => {
+        const newTodos = state.todos.reduce((accumulator, currentValue, currentIndex) => {
+          if (currentIndex > action.setTopTodoAsDone) {
+            return accumulator.concat([currentValue]);
+          }
+
+          return accumulator.concat([{
+            ...currentValue,
+            done: true
+          }]);
+        }, []);
 
         return {
           ...state,
