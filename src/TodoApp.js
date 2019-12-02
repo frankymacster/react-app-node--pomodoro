@@ -10,7 +10,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import createReducer from "./createReducer";
 
-const TodoForm = ({ saveTodo }) => {
+const TodoForm = ({
+  saveTodo
+}) => {
   const initialState = { value: "" };
 
   const reducer = createReducer(
@@ -56,7 +58,12 @@ const TodoForm = ({ saveTodo }) => {
   );
 };
 
-const TodoList = ({ todos, deleteTodo, editTodo, setNewText }) => (
+const TodoList = ({
+  todos,
+  deleteTodo,
+  editTodo,
+  setNewText
+}) => (
   <List>
     {todos.map((todo, index) => (
       <ListItem key={index.toString()} dense button>
@@ -97,13 +104,16 @@ const TodoList = ({ todos, deleteTodo, editTodo, setNewText }) => (
   </List>
 );
 
-const TodoApp = ({ setTopTodoAsDone }) => {
+const TodoApp = ({
+  todosDoneCount,
+  onAllTodosDone
+}) => {
   useEffect(() =>
     dispatch({
-      type: "setTopTodoAsDone",
-      setTopTodoAsDone
+      type: "setTodosDoneCount",
+      todosDoneCount
     }),
-    [setTopTodoAsDone]
+    [todosDoneCount]
   );
 
   const initialState = { todos: [] };
@@ -133,6 +143,9 @@ const TodoApp = ({ setTopTodoAsDone }) => {
         }
       },
       deleteTodo: (state, { todoIndex }) => ({
+        // TODO if todo was done, decrement todosDoneCount
+        // actually todosDoneCount should be replaced by actually checking which todos are done
+        // and syncing the Timer with a todo
         ...state,
         todos: state.todos.filter((_, index) => index !== todoIndex)
       }),
@@ -153,9 +166,9 @@ const TodoApp = ({ setTopTodoAsDone }) => {
           todos: newTodos
         }
       },
-      setTopTodoAsDone: (state, action) => {
+      setTodosDoneCount: (state, action) => {
         const newTodos = state.todos.reduce((accumulator, currentValue, currentIndex) => {
-          if (currentIndex > action.setTopTodoAsDone) {
+          if (currentIndex + 1 > action.todosDoneCount) {
             return accumulator.concat([currentValue]);
           }
 
@@ -174,6 +187,15 @@ const TodoApp = ({ setTopTodoAsDone }) => {
   );
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(
+    () => {
+      if (state.todos.every(todo => todo.done === true)) {
+        onAllTodosDone();
+      }
+    },
+    [state.todos]
+  );
 
   return (
     <>

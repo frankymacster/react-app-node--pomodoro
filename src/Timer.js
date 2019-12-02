@@ -1,56 +1,74 @@
 import React, { useReducer, useEffect } from "react";
 import createReducer from "./createReducer";
 
-function Timer({ title, duration = 5, triggerTimer, onDone }) {
+function Timer({
+  title,
+  duration = 5,
+  start,
+  stop,
+  onDone
+}) {
   const initialState = {
     count: 0,
-    timerStarted: false,
+    running: false,
   };
 
   const reducer = createReducer(initialState, {
-    incrementCount: (state, action) => ({
+    incrementCount: state => ({
       ...state,
       count: state.count + 1
     }),
-    setTimerStarted: (state, action) => ({
+    start: state => ({
       ...state,
-      timerStarted: action.timerStarted
-    })
+      running: true
+    }),
+    stop: state => ({
+      ...state,
+      running: false
+    }),
   });
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
   // https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
   useEffect(() => {
-    if (!state.timerStarted) {
+    if (!state.running) {
       return;
     }
 
     const interval = setInterval(() => {
-      dispatch({ type: "incrementCount" })
+      dispatch({
+        type: "incrementCount"
+      })
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state.timerStarted]);
+  }, [state.running]);
 
   useEffect(() => {
     if (state.count > 0 && state.count % duration === 0) {
       dispatch({
-        type: "setTimerStarted",
-        timerStarted: false,
+        type: "stop",
       });
       onDone(state);
     }
   }, [state.count]);
 
   useEffect(() => {
-    if (triggerTimer) {
+    if (start) {
       dispatch({
-        type: "setTimerStarted",
-        timerStarted: true,
+        type: "start",
       });
     }
-  }, [triggerTimer]);
+  }, [start]);
+
+  useEffect(() => {
+    if (stop) {
+      dispatch({
+        type: "stop",
+      });
+    }
+  }, [stop]);
 
   return <h1>{title} {state.count}</h1>;
 }
