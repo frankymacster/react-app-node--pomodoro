@@ -18,8 +18,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import classList from "./classList";
 import Blocks from "./Blocks";
 import Counter from "./Counter";
-import TodoApp from "./TodoApp";
-import Timer from "./Timer";
+import Pomodoro from "./Pomodoro";
 
 import './App.css';
 
@@ -192,46 +191,8 @@ const DataToComponent = {
       })}
     />
   ),
-  TodoList: ({ params: { state, dispatch } }) => (
-    <TodoApp
-      setTopTodoAsDone={state.setTopTodoAsDone}
-      // TODO onAllTasksDone: stop timers
-    />
-  ),
   Pomodoro: ({ params: { state, dispatch } }) => (
-    <>
-      <Timer
-        title="work"
-        duration={8}
-        triggerTimer={state.workTimerShouldStart}
-        onDone={s => {
-          dispatch({
-            type: "setTopTodoAsDone"
-          });
-          dispatch({
-            type: "startRestTimer"
-          });
-        }}
-      />
-      <Timer
-        title="rest"
-        duration={5}
-        triggerTimer={state.restTimerShouldStart}
-        onDone={s => {
-          dispatch({
-            type: "startWorkTimer"
-          })
-        }}
-      />
-
-      <button
-        onClick={() => dispatch({
-          type: "startWorkTimer"
-        })}
-      >
-        setTimerStarted
-      </button>
-    </>
+    <Pomodoro />
   )
 };
 

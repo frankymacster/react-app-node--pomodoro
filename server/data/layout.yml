@@ -35,7 +35,6 @@
         - type: ColumnChildren
           children:
             - type: Pomodoro
-            - type: TodoList
 - type: Footer
   children:
     - type: Link
