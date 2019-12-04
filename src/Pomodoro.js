@@ -5,103 +5,125 @@ import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 
 function Pomodoro() {
-  const timersInitialState = {
-    type: "idle", // "idle" | "work" | "rest"
+  const timers = {
+    states: {
+      idle: "idle",
+      work: "work",
+      rest: "rest",
+    },
+    actions: {
+      startWork: "startWork",
+      startRest: "startRest",
+      stop: "stop",
+    }
   };
-
-  // digraph G {
-  //   "idle" -> "work" [ label="startTaskWork" ];
-  //   "rest" -> "work" [ label="startTaskWork" ];
-  //   "work" -> "rest" [ label="startTaskRest" ];
-  //   "rest" -> "idle" [ label="stopTasks" ];
-  // }
-  const [timersState, timersDispatch] = useReducer(
+  timers.initialState = {
+    type: "idle",
+  };
+  timers.transitions = useReducer(
     createMachine(
-      timersInitialState,
+      /*
+        digraph G {
+          "idle" -> "work" [ label="startWork" ];
+          "rest" -> "work" [ label="startRest" ];
+          "work" -> "rest" [ label="startWork" ];
+          "rest" -> "idle" [ label="stop" ];
+        }
+      */
+      timers.initialState,
       {
-        idle: {
-          startTaskWork: state => ({
+        [timers.states.idle]: {
+          [timers.actions.startWork]: state => ({
             ...state,
-            type: "work"
+            type: timers.states.work
           }),
         },
-        work: {
-          startTaskRest: state => ({
+        [timers.states.work]: {
+          [timers.actions.startRest]: state => ({
             ...state,
-            type: "rest"
+            type: timers.states.rest
           }),
         },
-        rest: {
-          startTaskWork: state => ({
+        [timers.states.rest]: {
+          [timers.actions.startWork]: state => ({
             ...state,
-            type: "work"
+            type: timers.states.work
           }),
-          stopTasks: state => ({
+          [timers.actions.stop]: state => ({
             ...state,
-            type: "none"
+            type: timers.states.idle
           }),
         }
       }
     ),
-    timersInitialState
+    timers.initialState
   );
+  timers.currentState = timers.transitions[0];
+  timers.dispatch = timers.transitions[1];
 
 
-  const todosInitialState = {
+  const todos = {
+    actions: {
+      incrementTodosDoneCount: "incrementTodosDoneCount"
+    }
+  };
+  todos.initialState = {
     todosDoneCount: 0,
   };
-
-  const [todosState, todosDispatch] = useReducer(
+  todos.transitions = useReducer(
     createReducer(
-      timersInitialState,
+      todos.initialState,
       {
-        incrementTodosDoneCount: state => ({
+        [todos.actions.incrementTodosDoneCount]: state => ({
           ...state,
           todosDoneCount: state.todosDoneCount + 1
         })
       }
     ),
-    todosInitialState
+    todos.initialState
   );
+  todos.currentState = todos.transitions[0];
+  todos.dispatch = todos.transitions[1];
+
 
   return (
     <>
       <Timer
         title="work"
         duration={8}
-        start={timersState.type === "work"}
-        stop={timersState.type === "none"}
+        start={timers.currentState.type === timers.states.work}
+        stop={timers.currentState.type === timers.states.idle}
         onDone={s => {
-          todosDispatch({
-            type: "incrementTodosDoneCount"
-          });
-          timersDispatch({
-            type: "startTaskRest"
+          timers.dispatch({
+            type: timers.actions.startRest
           });
         }}
       />
       <Timer
         title="rest"
         duration={5}
-        start={timersState.type === "rest"}
-        stop={timersState.type === "none"}
+        start={timers.currentState.type === timers.states.rest}
+        stop={timers.currentState.type === timers.states.idle}
         onDone={s => {
-          timersDispatch({
-            type: "startTaskWork"
+          todos.dispatch({
+            type: todos.actions.incrementTodosDoneCount
+          });
+          timers.dispatch({
+            type: timers.actions.startWork
           })
         }}
       />
       <button
-        onClick={() => timersDispatch({
-          type: "startTaskWork"
+        onClick={() => timers.dispatch({
+          type: timers.actions.startWork
         })}
       >
         setTimerStarted
       </button>
       <TodoApp
-        todosDoneCount={todosState.todosDoneCount}
-        onAllTodosDone={() => timersDispatch({
-          type: "stopTasks"
+        todosDoneCount={todos.currentState.todosDoneCount}
+        onAllTodosDone={() => timers.dispatch({
+          type: timers.actions.stop
         })}
       />
     </>
