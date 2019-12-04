@@ -4,44 +4,55 @@ import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 
 function Pomodoro() {
-  const initialState = {
-    todosDoneCount: 0,
+  const timersInitialState = {
     runningTimer: "none", // "none" | "work" | "rest"
   };
 
-  const reducer = createReducer(initialState, {
-    incrementTodosDoneCount: state => ({
-      ...state,
-      todosDoneCount: state.todosDoneCount + 1
+  const [timersState, timersDispatch] = useReducer(
+    createReducer(timersInitialState, {
+      startRestTimer: state => ({
+        ...state,
+        runningTimer: "rest"
+      }),
+      startWorkTimer: state => ({
+        ...state,
+        runningTimer: "work"
+      }),
+      stopTimers: state => ({
+        ...state,
+        runningTimer: "none"
+      }),
     }),
-    startRestTimer: state => ({
-      ...state,
-      runningTimer: "rest"
-    }),
-    startWorkTimer: state => ({
-      ...state,
-      runningTimer: "work"
-    }),
-    stopTimers: state => ({
-      ...state,
-      runningTimer: "none"
-    }),
-  });
+    timersInitialState
+  );
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const todosInitialState = {
+    todosDoneCount: 0,
+  };
+
+  const [todosState, todosDispatch] = useReducer(
+    createReducer(timersInitialState, {
+      incrementTodosDoneCount: state => ({
+        ...state,
+        todosDoneCount: state.todosDoneCount + 1
+      })
+    }),
+    todosInitialState
+  );
 
   return (
     <>
       <Timer
         title="work"
         duration={8}
-        start={state.runningTimer === "work"}
-        stop={state.runningTimer === "none"}
+        start={timersState.runningTimer === "work"}
+        stop={timersState.runningTimer === "none"}
         onDone={s => {
-          dispatch({
+          todosDispatch({
             type: "incrementTodosDoneCount"
           });
-          dispatch({
+          timersDispatch({
             type: "startRestTimer"
           });
         }}
@@ -49,24 +60,24 @@ function Pomodoro() {
       <Timer
         title="rest"
         duration={5}
-        start={state.runningTimer === "rest"}
-        stop={state.runningTimer === "none"}
+        start={timersState.runningTimer === "rest"}
+        stop={timersState.runningTimer === "none"}
         onDone={s => {
-          dispatch({
+          timersDispatch({
             type: "startWorkTimer"
           })
         }}
       />
       <button
-        onClick={() => dispatch({
+        onClick={() => timersDispatch({
           type: "startWorkTimer"
         })}
       >
         setTimerStarted
       </button>
       <TodoApp
-        todosDoneCount={state.todosDoneCount}
-        onAllTodosDone={() => dispatch({
+        todosDoneCount={todosState.todosDoneCount}
+        onAllTodosDone={() => timersDispatch({
           type: "stopTimers"
         })}
       />
