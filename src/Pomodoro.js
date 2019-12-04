@@ -1,28 +1,48 @@
 import React, { useReducer } from "react";
+import createMachine from "./createMachine";
 import createReducer from "./createReducer";
 import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 
 function Pomodoro() {
   const timersInitialState = {
-    runningTimer: "none", // "none" | "work" | "rest"
+    type: "idle", // "idle" | "work" | "rest"
   };
 
+  // digraph G {
+  //   "idle" -> "work" [ label="startTaskWork" ];
+  //   "rest" -> "work" [ label="startTaskWork" ];
+  //   "work" -> "rest" [ label="startTaskRest" ];
+  //   "rest" -> "idle" [ label="stopTasks" ];
+  // }
   const [timersState, timersDispatch] = useReducer(
-    createReducer(timersInitialState, {
-      startRestTimer: state => ({
-        ...state,
-        runningTimer: "rest"
-      }),
-      startWorkTimer: state => ({
-        ...state,
-        runningTimer: "work"
-      }),
-      stopTimers: state => ({
-        ...state,
-        runningTimer: "none"
-      }),
-    }),
+    createMachine(
+      timersInitialState,
+      {
+        idle: {
+          startTaskWork: state => ({
+            ...state,
+            type: "work"
+          }),
+        },
+        work: {
+          startTaskRest: state => ({
+            ...state,
+            type: "rest"
+          }),
+        },
+        rest: {
+          startTaskWork: state => ({
+            ...state,
+            type: "work"
+          }),
+          stopTasks: state => ({
+            ...state,
+            type: "none"
+          }),
+        }
+      }
+    ),
     timersInitialState
   );
 
@@ -32,12 +52,15 @@ function Pomodoro() {
   };
 
   const [todosState, todosDispatch] = useReducer(
-    createReducer(timersInitialState, {
-      incrementTodosDoneCount: state => ({
-        ...state,
-        todosDoneCount: state.todosDoneCount + 1
-      })
-    }),
+    createReducer(
+      timersInitialState,
+      {
+        incrementTodosDoneCount: state => ({
+          ...state,
+          todosDoneCount: state.todosDoneCount + 1
+        })
+      }
+    ),
     todosInitialState
   );
 
@@ -46,31 +69,31 @@ function Pomodoro() {
       <Timer
         title="work"
         duration={8}
-        start={timersState.runningTimer === "work"}
-        stop={timersState.runningTimer === "none"}
+        start={timersState.type === "work"}
+        stop={timersState.type === "none"}
         onDone={s => {
           todosDispatch({
             type: "incrementTodosDoneCount"
           });
           timersDispatch({
-            type: "startRestTimer"
+            type: "startTaskRest"
           });
         }}
       />
       <Timer
         title="rest"
         duration={5}
-        start={timersState.runningTimer === "rest"}
-        stop={timersState.runningTimer === "none"}
+        start={timersState.type === "rest"}
+        stop={timersState.type === "none"}
         onDone={s => {
           timersDispatch({
-            type: "startWorkTimer"
+            type: "startTaskWork"
           })
         }}
       />
       <button
         onClick={() => timersDispatch({
-          type: "startWorkTimer"
+          type: "startTaskWork"
         })}
       >
         setTimerStarted
@@ -78,7 +101,7 @@ function Pomodoro() {
       <TodoApp
         todosDoneCount={todosState.todosDoneCount}
         onAllTodosDone={() => timersDispatch({
-          type: "stopTimers"
+          type: "stopTasks"
         })}
       />
     </>
