@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect } from "react";
+import createMachine from "./createMachine";
 import createReducer from "./createReducer";
 
 function Timer({
@@ -8,69 +9,112 @@ function Timer({
   stop,
   onDone
 }) {
-  const initialState = {
-    count: 0,
-    running: false,
+  const timer = {
+    states: {
+      idle: "idle",
+      running: "running"
+    },
+    actions: {
+      start: "start",
+      stop: "stop"
+    }
   };
+  timer.initialState = {
+    type: timer.states.idle
+  };
+  timer.transitions = useReducer(
+    createMachine(
+      timer.initialState,
+      {
+        [timer.states.idle]: {
+          [timer.actions.start]: state => ({
+            ...state,
+            type: timer.states.running
+          }),
+        },
+        [timer.states.running]: {
+          [timer.actions.stop]: state => ({
+            ...state,
+            type: timer.states.idle
+          }),
+        }
+      }
+    ),
+    timer.initialState
+  );
+  timer.currentState = timer.transitions[0];
+  timer.dispatch = timer.transitions[1];
 
-  const reducer = createReducer(initialState, {
-    incrementCount: state => ({
-      ...state,
-      count: state.count + 1
-    }),
-    start: state => ({
-      ...state,
-      running: true
-    }),
-    stop: state => ({
-      ...state,
-      running: false
-    }),
-  });
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const counter = {
+    // states: 0 | 1 | 2 | ...
+    actions: {
+      incrementCount: "incrementCount",
+    }
+  };
+  counter.initialState = {
+    count: 0, 
+  };
+  counter.transitions = useReducer(
+    createReducer(
+      counter.initialState,
+      {
+        [counter.actions.incrementCount]: state => ({
+          ...state,
+          count: state.count + 1
+        }),
+      }
+    ),
+    counter.initialState
+  );
+  counter.currentState = counter.transitions[0];
+  counter.dispatch = counter.transitions[1];
+
 
   // https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
+  // use thunk for this
   useEffect(() => {
-    if (!state.running) {
+    if (timer.currentState.type !== timer.states.running) {
       return;
     }
 
     const interval = setInterval(() => {
-      dispatch({
-        type: "incrementCount"
+      counter.dispatch({
+        type: counter.actions.incrementCount
       })
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state.running]);
+  }, [timer.currentState.type]);
 
   useEffect(() => {
-    if (state.count > 0 && state.count % duration === 0) {
-      dispatch({
-        type: "stop",
+    if (counter.currentState.count > 0
+    &&  counter.currentState.count % duration === 0
+    ) {
+      timer.dispatch({
+        type: timer.actions.stop,
       });
-      onDone(state);
+      onDone(counter.currentState);
     }
-  }, [state.count]);
+  }, [counter.currentState.count]);
 
   useEffect(() => {
     if (start) {
-      dispatch({
-        type: "start",
+      timer.dispatch({
+        type: timer.actions.start,
       });
     }
   }, [start]);
 
   useEffect(() => {
     if (stop) {
-      dispatch({
-        type: "stop",
+      timer.dispatch({
+        type: timer.actions.stop,
       });
     }
   }, [stop]);
 
-  return <h1>{title} {state.count}</h1>;
+  return <h1>{title} {counter.currentState.count}</h1>;
 }
 
 export default Timer;
