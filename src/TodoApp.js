@@ -13,7 +13,10 @@ import createReducer from "./createReducer";
 const TodoForm = ({
   saveTodo
 }) => {
-  const initialState = { value: "" };
+  const initialState = {
+    value: "",
+    count: 0
+  };
 
   const reducer = createReducer(
     initialState,
@@ -25,6 +28,10 @@ const TodoForm = ({
       reset: state => ({
         ...state,
         value: ""
+      }),
+      incrementCount: state => ({
+        ...state,
+        count: state.count + 1
       })
     }
   );
@@ -37,22 +44,24 @@ const TodoForm = ({
         e.preventDefault();
 
         saveTodo({
+          id: state.count,
           text: state.value,
           editing: false,
           done: false,
         });
         dispatch({ type: "reset" });
+        dispatch({ type: "incrementCount" });
       }}
     >
       <TextField
         variant="outlined"
         placeholder="Add todo"
         margin="normal"
+        value={state.value}
         onChange={e => dispatch({
           type: "setValue",
           value: e.target.value
         })}
-        value={state.value}
       />
     </form>
   );
@@ -105,15 +114,16 @@ const TodoList = ({
 );
 
 const TodoApp = ({
-  todosDoneCount,
-  onAllTodosDone
+  doneTodos,
+  areAllTodosDone,
+  getNextTodo
 }) => {
   useEffect(() =>
     dispatch({
-      type: "setTodosDoneCount",
-      todosDoneCount
+      type: "setDoneTodos",
+      doneTodos
     }),
-    [todosDoneCount]
+    [doneTodos]
   );
 
   const initialState = { todos: [] };
@@ -166,16 +176,16 @@ const TodoApp = ({
           todos: newTodos
         }
       },
-      setTodosDoneCount: (state, action) => {
-        const newTodos = state.todos.reduce((accumulator, currentValue, currentIndex) => {
-          if (currentIndex + 1 > action.todosDoneCount) {
-            return accumulator.concat([currentValue]);
+      setDoneTodos: (state, action) => {
+        const newTodos = state.todos.reduce((accumulator, currentValue) => {
+          if (action.doneTodos.some(todo => todo.id === currentValue.id)) {
+            return accumulator.concat([{
+              ...currentValue,
+              done: true
+            }]);
           }
 
-          return accumulator.concat([{
-            ...currentValue,
-            done: true
-          }]);
+          return accumulator.concat([currentValue]);
         }, []);
 
         return {
@@ -190,9 +200,8 @@ const TodoApp = ({
 
   useEffect(
     () => {
-      if (state.todos.every(todo => todo.done === true)) {
-        onAllTodosDone();
-      }
+      areAllTodosDone(state.todos.every(todo => todo.done === true));
+      getNextTodo(state.todos.filter(todo => !todo.done)[0]);
     },
     [state.todos]
   );
@@ -207,7 +216,6 @@ const TodoApp = ({
           })
         }
       />
-
       <TodoList
         todos={state.todos}
         deleteTodo={todoIndex =>

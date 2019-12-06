@@ -5,6 +5,37 @@ import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 
 function Pomodoro() {
+  const todos = {
+    // states: 0 | 1 | 2 | ...
+    actions: {
+      addDoneTodo: "addDoneTodo",
+      setCurrentTodo: "setCurrentTodo"
+    }
+  };
+  todos.initialState = {
+    doneTodos: [],
+    currentTodo: null
+  };
+  todos.transitions = useReducer(
+    createReducer(
+      todos.initialState,
+      {
+        [todos.actions.addDoneTodo]: (state, action) => ({
+          ...state,
+          doneTodos: [ ...state.doneTodos, action.doneTodo ]
+        }),
+        [todos.actions.setCurrentTodo]: (state, action) => ({
+          ...state,
+          currentTodo: action.currentTodo
+        }),
+      }
+    ),
+    todos.initialState
+  );
+  todos.currentState = todos.transitions[0];
+  todos.dispatch = todos.transitions[1];
+
+
   const timers = {
     states: {
       idle: "idle",
@@ -33,10 +64,16 @@ function Pomodoro() {
       timers.initialState,
       {
         [timers.states.idle]: {
-          [timers.actions.startWork]: state => ({
-            ...state,
-            type: timers.states.work
-          }),
+          [timers.actions.startWork]: state => {
+            if (!todos.currentState.currentTodo) {
+              return state;
+            }
+
+            return {
+              ...state,
+              type: timers.states.work
+            };
+          },
         },
         [timers.states.work]: {
           [timers.actions.startRest]: state => ({
@@ -50,8 +87,8 @@ function Pomodoro() {
             type: timers.states.work
           }),
           [timers.actions.stop]: state => ({
-            ...state,
-            type: timers.states.idle
+              ...state,
+              type: timers.states.idle
           }),
         }
       }
@@ -60,30 +97,6 @@ function Pomodoro() {
   );
   timers.currentState = timers.transitions[0];
   timers.dispatch = timers.transitions[1];
-
-
-  const todos = {
-    actions: {
-      incrementTodosDoneCount: "incrementTodosDoneCount"
-    }
-  };
-  todos.initialState = {
-    todosDoneCount: 0,
-  };
-  todos.transitions = useReducer(
-    createReducer(
-      todos.initialState,
-      {
-        [todos.actions.incrementTodosDoneCount]: state => ({
-          ...state,
-          todosDoneCount: state.todosDoneCount + 1
-        })
-      }
-    ),
-    todos.initialState
-  );
-  todos.currentState = todos.transitions[0];
-  todos.dispatch = todos.transitions[1];
 
 
   return (
@@ -104,27 +117,43 @@ function Pomodoro() {
         duration={5}
         start={timers.currentState.type === timers.states.rest}
         stop={timers.currentState.type === timers.states.idle}
-        onDone={s => {
+        onDone={() => 
           todos.dispatch({
-            type: todos.actions.incrementTodosDoneCount
-          });
-          timers.dispatch({
-            type: timers.actions.startWork
-          })
-        }}
+            type: todos.actions.addDoneTodo,
+            doneTodo: todos.currentState.currentTodo
+          })          
+        }
       />
       <button
         onClick={() => timers.dispatch({
           type: timers.actions.startWork
         })}
       >
-        setTimerStarted
+        start
       </button>
       <TodoApp
-        todosDoneCount={todos.currentState.todosDoneCount}
-        onAllTodosDone={() => timers.dispatch({
-          type: timers.actions.stop
-        })}
+        doneTodos={todos.currentState.doneTodos}
+        getNextTodo={todo => {
+          // don't set undefined todo as currentTodo
+          if (todo) {
+            todos.dispatch({
+              type: todos.actions.setCurrentTodo,
+              currentTodo: todo
+            });
+          }
+        }}
+        areAllTodosDone={yes => {
+          // decide if go to "work" or "idle"
+          if (yes) {
+            timers.dispatch({
+              type: timers.actions.stop
+            });
+          } else {
+            timers.dispatch({
+              type: timers.actions.startWork
+            });
+          }
+        }}
       />
     </>
   );
