@@ -4,116 +4,111 @@ import createReducer from "./createReducer";
 import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 
-function Pomodoro() {
-  const todos = {
-    // states: 0 | 1 | 2 | ...
-    actions: {
-      onRestTimerDone: "onRestTimerDone",
-      onGotNextTodo: "onGotNextTodo"
+
+const todos = {
+  // states: 0 | 1 | 2 | ...
+  actions: {
+    onRestTimerDone: "onRestTimerDone",
+    onGotNextTodo: "onGotNextTodo"
+  }
+};
+todos.initialState = {
+  doneTodos: [],
+  currentTodo: null
+};
+todos.transitions =
+  createReducer(
+    todos.initialState,
+    {
+      [todos.actions.onRestTimerDone]: (state, action) => ({
+        ...state,
+        doneTodos: [ ...state.doneTodos, action.doneTodo ]
+      }),
+      [todos.actions.onGotNextTodo]: (state, action) => {
+        if (!action.currentTodo) {
+          return state;
+        }
+
+        return {
+          ...state,
+          currentTodo: action.currentTodo
+        }
+      },
+      [todos.actions.onAllTodosDone]: state => ({
+        ...state,
+        currentTodo: null
+      }),
     }
-  };
-  todos.initialState = {
-    doneTodos: [],
-    currentTodo: null
-  };
-  todos.transitions = useReducer(
-    createReducer(
-      todos.initialState,
-      {
-        [todos.actions.onRestTimerDone]: (state, action) => ({
-          ...state,
-          doneTodos: [ ...state.doneTodos, action.doneTodo ]
-        }),
-        [todos.actions.onGotNextTodo]: (state, action) => {
-          if (!action.currentTodo) {
-            return state;
-          }
-
-          return {
-            ...state,
-            currentTodo: action.currentTodo
-          }
-        },
-        [todos.actions.onAllTodosDone]: state => ({
-          ...state,
-          currentTodo: null
-        }),
-      }
-    ),
-    todos.initialState
   );
-  todos.currentState = todos.transitions[0];
-  todos.dispatch = todos.transitions[1];
 
 
-  const timers = {
-    states: {
-      idle: "idle",
-      work: "work",
-      rest: "rest",
+const timers = {
+  states: {
+    idle: "idle",
+    work: "work",
+    rest: "rest",
+  },
+  actions: {
+    onTaskStartRequested: "onTaskStartRequested",
+    onWorkDone: "onWorkDone",
+    onAllTodosDone: "onAllTodosDone",
+  }
+};
+timers.initialState = {
+  type: "idle",
+};
+timers.transitions = createMachine(
+  /*
+    digraph G {
+      "idle" -> "work" [ label="onTaskStartRequested" ];
+      "rest" -> "work" [ label="onNotAllTodosDone" ];
+      "work" -> "rest" [ label="onWorkDone" ];
+      "rest" -> "idle" [ label="onAllTodosDone" ];
+    }
+  */
+  timers.initialState,
+  {
+    [timers.states.idle]: {
+      [timers.actions.onTaskStartRequested]: state => {
+        if (!todos.currentState.currentTodo) {
+          return state;
+        }
+
+        return {
+          ...state,
+          type: timers.states.work
+        };
+      },
     },
-    actions: {
-      onTaskStartRequested: "onTaskStartRequested",
-      onWorkDone: "onWorkDone",
-      onAllTodosDone: "onAllTodosDone",
+    [timers.states.work]: {
+      [timers.actions.onWorkDone]: state => ({
+        ...state,
+        type: timers.states.rest
+      }),
+    },
+    [timers.states.rest]: {
+      [timers.actions.onNotAllTodosDone]: state => {
+        if (!todos.currentState.currentTodo) {
+          return state;
+        }
+
+        return {
+          ...state,
+          type: timers.states.work
+        };
+      },  
+      [timers.actions.onAllTodosDone]: state => ({
+          ...state,
+          type: timers.states.idle,
+      }),
     }
-  };
-  timers.initialState = {
-    type: "idle",
-  };
-  timers.transitions = useReducer(
-    createMachine(
-      /*
-        digraph G {
-          "idle" -> "work" [ label="onTaskStartRequested" ];
-          "rest" -> "work" [ label="onNotAllTodosDone" ];
-          "work" -> "rest" [ label="onWorkDone" ];
-          "rest" -> "idle" [ label="onAllTodosDone" ];
-        }
-      */
-      timers.initialState,
-      {
-        [timers.states.idle]: {
-          [timers.actions.onTaskStartRequested]: state => {
-            if (!todos.currentState.currentTodo) {
-              return state;
-            }
+  }
+);
 
-            return {
-              ...state,
-              type: timers.states.work
-            };
-          },
-        },
-        [timers.states.work]: {
-          [timers.actions.onWorkDone]: state => ({
-            ...state,
-            type: timers.states.rest
-          }),
-        },
-        [timers.states.rest]: {
-          [timers.actions.onNotAllTodosDone]: state => {
-            if (!todos.currentState.currentTodo) {
-              return state;
-            }
 
-            return {
-              ...state,
-              type: timers.states.work
-            };
-          },  
-          [timers.actions.onAllTodosDone]: state => ({
-              ...state,
-              type: timers.states.idle,
-          }),
-        }
-      }
-    ),
-    timers.initialState
-  );
-  timers.currentState = timers.transitions[0];
-  timers.dispatch = timers.transitions[1];
-
+function Pomodoro() {
+  [timers.currentState, timers.dispatch] = useReducer(timers.transitions, timers.initialState);
+  [todos.currentState, todos.dispatch] = useReducer(todos.transitions, todos.initialState);
 
   return (
     <>
@@ -154,7 +149,7 @@ function Pomodoro() {
         onChange={ts => {
           todos.dispatch({
             type: todos.actions.onGotNextTodo,
-            currentTodo: ts.filter(todo => !todo.done)[0]
+            currentTodo: ts.filter(todo => !todo.done)[0] || null
           });
 
           if (ts.every(todo => todo.done === true)) {
