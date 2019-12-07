@@ -152,9 +152,6 @@ const TodoApp = ({
         }
       },
       deleteTodo: (state, { todoIndex }) => ({
-        // TODO if todo was done, decrement todosDoneCount
-        // actually todosDoneCount should be replaced by actually checking which todos are done
-        // and syncing the Timer with a todo
         ...state,
         todos: state.todos.filter((_, index) => index !== todoIndex)
       }),
