@@ -34,6 +34,10 @@ function Pomodoro() {
             currentTodo: action.currentTodo
           }
         },
+        [todos.actions.onAllTodosDone]: state => ({
+          ...state,
+          currentTodo: null
+        }),
       }
     ),
     todos.initialState
@@ -100,7 +104,7 @@ function Pomodoro() {
           },  
           [timers.actions.onAllTodosDone]: state => ({
               ...state,
-              type: timers.states.idle
+              type: timers.states.idle,
           }),
         }
       }
@@ -137,27 +141,28 @@ function Pomodoro() {
         }
       />
       <button
-        onClick={() =>
+        onClick={() => {
           timers.dispatch({
             type: timers.actions.onTaskStartRequested
-          })
-        }
+          });
+        }}
       >
         start
       </button>
       <TodoApp
         doneTodos={todos.currentState.doneTodos}
-        getNextTodo={todo =>
+        onChange={ts => {
           todos.dispatch({
             type: todos.actions.onGotNextTodo,
-            currentTodo: todo
-          })
-        }
-        areAllTodosDone={yes => {
-          // decide if go to "work" or "idle"
-          if (yes) {
+            currentTodo: ts.filter(todo => !todo.done)[0]
+          });
+
+          if (ts.every(todo => todo.done === true)) {
             timers.dispatch({
               type: timers.actions.onAllTodosDone
+            });
+            todos.dispatch({
+              type: todos.actions.onAllTodosDone
             });
           } else {
             timers.dispatch({

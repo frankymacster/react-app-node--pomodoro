@@ -115,8 +115,7 @@ const TodoList = ({
 
 const TodoApp = ({
   doneTodos,
-  areAllTodosDone,
-  getNextTodo
+  onChange
 }) => {
   useEffect(() =>
     dispatch({
@@ -200,8 +199,7 @@ const TodoApp = ({
 
   useEffect(
     () => {
-      areAllTodosDone(state.todos.every(todo => todo.done === true));
-      getNextTodo(state.todos.filter(todo => !todo.done)[0]);
+      onChange(state.todos);
     },
     [state.todos]
   );
