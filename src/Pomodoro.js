@@ -8,8 +8,8 @@ function Pomodoro() {
   const todos = {
     // states: 0 | 1 | 2 | ...
     actions: {
-      addDoneTodo: "addDoneTodo",
-      setCurrentTodo: "setCurrentTodo"
+      onRestTimerDone: "onRestTimerDone",
+      onGotNextTodo: "onGotNextTodo"
     }
   };
   todos.initialState = {
@@ -20,14 +20,20 @@ function Pomodoro() {
     createReducer(
       todos.initialState,
       {
-        [todos.actions.addDoneTodo]: (state, action) => ({
+        [todos.actions.onRestTimerDone]: (state, action) => ({
           ...state,
           doneTodos: [ ...state.doneTodos, action.doneTodo ]
         }),
-        [todos.actions.setCurrentTodo]: (state, action) => ({
-          ...state,
-          currentTodo: action.currentTodo
-        }),
+        [todos.actions.onGotNextTodo]: (state, action) => {
+          if (!action.currentTodo) {
+            return state;
+          }
+
+          return {
+            ...state,
+            currentTodo: action.currentTodo
+          }
+        },
       }
     ),
     todos.initialState
@@ -43,9 +49,9 @@ function Pomodoro() {
       rest: "rest",
     },
     actions: {
-      startWork: "startWork",
-      startRest: "startRest",
-      stop: "stop",
+      onTaskStartRequested: "onTaskStartRequested",
+      onWorkDone: "onWorkDone",
+      onAllTodosDone: "onAllTodosDone",
     }
   };
   timers.initialState = {
@@ -55,16 +61,16 @@ function Pomodoro() {
     createMachine(
       /*
         digraph G {
-          "idle" -> "work" [ label="startWork" ];
-          "rest" -> "work" [ label="startRest" ];
-          "work" -> "rest" [ label="startWork" ];
-          "rest" -> "idle" [ label="stop" ];
+          "idle" -> "work" [ label="onTaskStartRequested" ];
+          "rest" -> "work" [ label="onNotAllTodosDone" ];
+          "work" -> "rest" [ label="onWorkDone" ];
+          "rest" -> "idle" [ label="onAllTodosDone" ];
         }
       */
       timers.initialState,
       {
         [timers.states.idle]: {
-          [timers.actions.startWork]: state => {
+          [timers.actions.onTaskStartRequested]: state => {
             if (!todos.currentState.currentTodo) {
               return state;
             }
@@ -76,17 +82,23 @@ function Pomodoro() {
           },
         },
         [timers.states.work]: {
-          [timers.actions.startRest]: state => ({
+          [timers.actions.onWorkDone]: state => ({
             ...state,
             type: timers.states.rest
           }),
         },
         [timers.states.rest]: {
-          [timers.actions.startWork]: state => ({
-            ...state,
-            type: timers.states.work
-          }),
-          [timers.actions.stop]: state => ({
+          [timers.actions.onNotAllTodosDone]: state => {
+            if (!todos.currentState.currentTodo) {
+              return state;
+            }
+
+            return {
+              ...state,
+              type: timers.states.work
+            };
+          },  
+          [timers.actions.onAllTodosDone]: state => ({
               ...state,
               type: timers.states.idle
           }),
@@ -106,11 +118,11 @@ function Pomodoro() {
         duration={8}
         start={timers.currentState.type === timers.states.work}
         stop={timers.currentState.type === timers.states.idle}
-        onDone={s => {
+        onDone={() =>
           timers.dispatch({
-            type: timers.actions.startRest
-          });
-        }}
+            type: timers.actions.onWorkDone
+          })
+        }
       />
       <Timer
         title="rest"
@@ -119,38 +131,37 @@ function Pomodoro() {
         stop={timers.currentState.type === timers.states.idle}
         onDone={() => 
           todos.dispatch({
-            type: todos.actions.addDoneTodo,
+            type: todos.actions.onRestTimerDone,
             doneTodo: todos.currentState.currentTodo
           })          
         }
       />
       <button
-        onClick={() => timers.dispatch({
-          type: timers.actions.startWork
-        })}
+        onClick={() =>
+          timers.dispatch({
+            type: timers.actions.onTaskStartRequested
+          })
+        }
       >
         start
       </button>
       <TodoApp
         doneTodos={todos.currentState.doneTodos}
-        getNextTodo={todo => {
-          // don't set undefined todo as currentTodo
-          if (todo) {
-            todos.dispatch({
-              type: todos.actions.setCurrentTodo,
-              currentTodo: todo
-            });
-          }
-        }}
+        getNextTodo={todo =>
+          todos.dispatch({
+            type: todos.actions.onGotNextTodo,
+            currentTodo: todo
+          })
+        }
         areAllTodosDone={yes => {
           // decide if go to "work" or "idle"
           if (yes) {
             timers.dispatch({
-              type: timers.actions.stop
+              type: timers.actions.onAllTodosDone
             });
           } else {
             timers.dispatch({
-              type: timers.actions.startWork
+              type: timers.actions.onNotAllTodosDone
             });
           }
         }}
