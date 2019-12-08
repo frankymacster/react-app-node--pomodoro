@@ -6,17 +6,21 @@ function Timer({
   title,
   duration = 5,
   start,
-  stop,
+  pause,
+  resume,
   onDone
 }) {
   const timer = {
     states: {
       idle: "idle",
-      running: "running"
+      running: "running",
+      paused: "paused",
     },
     actions: {
-      start: "start",
-      stop: "stop"
+      onTimerStartRequested: "onTimerStartRequested",
+      onTimerPauseRequested: "onTimerPauseRequested",
+      onTimerResumeRequested: "onTimerResumeRequested",
+      onCounterDone: "onCounterDone",
     }
   };
   timer.initialState = {
@@ -24,18 +28,34 @@ function Timer({
   };
   timer.transitions = useReducer(
     createMachine(
+      // digraph G {
+      //   "idle" -> "running" [ label="onTimerStartRequested" ]; 
+      //   "running" -> "idle" [ label="stop" ];
+      //   "running" -> "paused" [ label="onTimerPauseRequested" ];
+      //   "paused" -> "running" [ label="onTimerResumeRequested" ];
+      // }
       timer.initialState,
       {
         [timer.states.idle]: {
-          [timer.actions.start]: state => ({
+          [timer.actions.onTimerStartRequested]: state => ({
             ...state,
             type: timer.states.running
           }),
         },
         [timer.states.running]: {
-          [timer.actions.stop]: state => ({
+          [timer.actions.onCounterDone]: state => ({
             ...state,
             type: timer.states.idle
+          }),
+          [timer.actions.onTimerPauseRequested]: state => ({
+            ...state,
+            type: timer.states.paused
+          }),
+        },
+        [timer.states.paused]: {
+          [timer.actions.onTimerResumeRequested]: state => ({
+            ...state,
+            type: timer.states.running
           }),
         }
       }
@@ -92,7 +112,7 @@ function Timer({
     &&  counter.currentState.count % duration === 0
     ) {
       timer.dispatch({
-        type: timer.actions.stop,
+        type: timer.actions.onCounterDone,
       });
       onDone(counter.currentState);
     }
@@ -101,18 +121,26 @@ function Timer({
   useEffect(() => {
     if (start) {
       timer.dispatch({
-        type: timer.actions.start,
+        type: timer.actions.onTimerStartRequested,
       });
     }
   }, [start]);
 
   useEffect(() => {
-    if (stop) {
+    if (pause) {
       timer.dispatch({
-        type: timer.actions.stop,
+        type: timer.actions.onTimerPauseRequested,
       });
     }
-  }, [stop]);
+  }, [pause]);
+
+  useEffect(() => {
+    if (resume) {
+      timer.dispatch({
+        type: timer.actions.onTimerResumeRequested,
+      });
+    }
+  }, [resume]);
 
   return <h1>{title} {counter.currentState.count}</h1>;
 }

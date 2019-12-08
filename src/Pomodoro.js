@@ -3,6 +3,7 @@ import createMachine from "./createMachine";
 import createReducer from "./createReducer";
 import TodoApp from "./TodoApp";
 import Timer from "./Timer";
+import ToggleButton from "./ToggleButton";
 
 
 const todos = {
@@ -106,9 +107,35 @@ timers.transitions = createMachine(
 );
 
 
+const messages = {
+  actions: {
+    onTaskPauseRequested: "onTaskPauseRequested",
+    onTaskResumeRequested: "onTaskResumeRequested",
+  },
+  states: {
+    pause: "pause",
+    resume: "resume",
+  }
+};
+messages.initialState = {};
+messages.transitions = createReducer(
+  messages.initialState,
+  {
+    [messages.actions.onTaskPauseRequested]: state => ({
+      ...state,
+      type: messages.states.pause
+    }),
+    [messages.actions.onTaskResumeRequested]: state => ({
+      ...state,
+      type: messages.states.resume
+    }),
+  });
+
+
 function Pomodoro() {
   [timers.currentState, timers.dispatch] = useReducer(timers.transitions, timers.initialState);
   [todos.currentState, todos.dispatch] = useReducer(todos.transitions, todos.initialState);
+  [messages.currentState, messages.dispatch] = useReducer(messages.transitions, messages.initialState);
 
   return (
     <>
@@ -116,7 +143,8 @@ function Pomodoro() {
         title="work"
         duration={8}
         start={timers.currentState.type === timers.states.work}
-        stop={timers.currentState.type === timers.states.idle}
+        pause={messages.currentState.type === messages.states.pause}
+        resume={messages.currentState.type === messages.states.resume}
         onDone={() =>
           timers.dispatch({
             type: timers.actions.onWorkDone
@@ -127,23 +155,34 @@ function Pomodoro() {
         title="rest"
         duration={5}
         start={timers.currentState.type === timers.states.rest}
-        stop={timers.currentState.type === timers.states.idle}
+        pause={messages.currentState.type === messages.states.pause}
+        resume={messages.currentState.type === messages.states.resume}
         onDone={() => 
           todos.dispatch({
             type: todos.actions.onRestTimerDone,
             doneTodo: todos.currentState.currentTodo
-          })          
+          })
+          // TODO should change toggleButton back to start
         }
       />
-      <button
-        onClick={() => {
+      <ToggleButton
+        turnOnText={"start"}
+        turnOffText={"pause"}
+        toggleCondition={todos.currentState.currentTodo}
+        onTurnedOn={() => {
           timers.dispatch({
             type: timers.actions.onTaskStartRequested
           });
+          messages.dispatch({
+            type: messages.actions.onTaskResumeRequested
+          });
         }}
-      >
-        start
-      </button>
+        onTurnedOff={() => {
+          messages.dispatch({
+            type: messages.actions.onTaskPauseRequested
+          });
+        }}
+      />
       <TodoApp
         doneTodos={todos.currentState.doneTodos}
         onChange={ts => {
