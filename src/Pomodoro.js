@@ -162,10 +162,10 @@ function Pomodoro() {
             type: todos.actions.onRestTimerDone,
             doneTodo: todos.currentState.currentTodo
           })
-          // TODO should change toggleButton back to start
         }
       />
       <ToggleButton
+        turnOff={timers.currentState.type === timers.states.idle}
         turnOnText={"start"}
         turnOffText={"pause"}
         toggleCondition={todos.currentState.currentTodo}

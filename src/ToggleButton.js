@@ -25,6 +25,10 @@ toggleButton.transitions = createMachine(
       [toggleButton.actions.onToggleRequested]: state => ({
         ...state,
         type: toggleButton.states.off
+      }),
+      [toggleButton.actions.reset]: state => ({
+        ...state,
+        type: toggleButton.initialState.type
       })
     },
     [toggleButton.states.off]: {
@@ -38,6 +42,7 @@ toggleButton.transitions = createMachine(
 
 
 function ToggleButton({
+  turnOff,
   turnOnText,
   turnOffText,
   toggleCondition,
@@ -46,6 +51,14 @@ function ToggleButton({
 }) {
   [toggleButton.currentState, toggleButton.dispatch] = useReducer(toggleButton.transitions, toggleButton.initialState);
 
+  useEffect(() => {
+    if (turnOff) {
+      toggleButton.dispatch({
+        type: toggleButton.actions.reset
+      });
+    }
+  }, [turnOff]);
+  
   useEffect(() => {
     if (toggleButton.currentState.type === toggleButton.states.on) {
       onTurnedOn();
