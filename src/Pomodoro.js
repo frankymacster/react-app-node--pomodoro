@@ -45,106 +45,99 @@ todos.transitions =
 
 const timers = {
   states: {
-    idle: "idle",
-    work: "work",
-    rest: "rest",
+    off: "off",
+    work_on: "work_on",
+    work_off: "work_off",
+    rest_on: "rest_on",
+    rest_off: "rest_off",
   },
   actions: {
-    onTaskStartRequested: "onTaskStartRequested",
+    onToggleButtonOnTurnedOn: "onToggleButtonOnTurnedOn",
+    onToggleButtonOnTurnedOff: "onToggleButtonOnTurnedOff",
     onWorkDone: "onWorkDone",
     onAllTodosDone: "onAllTodosDone",
+    onNotAllTodosDone: "onNotAllTodosDone",
   }
 };
 timers.initialState = {
-  type: "idle",
+  type: timers.states.off,
 };
 timers.transitions = createMachine(
-  /*
-    digraph G {
-      "idle" -> "work" [ label="onTaskStartRequested" ];
-      "rest" -> "work" [ label="onNotAllTodosDone" ];
-      "work" -> "rest" [ label="onWorkDone" ];
-      "rest" -> "idle" [ label="onAllTodosDone" ];
-    }
-  */
   timers.initialState,
   {
-    [timers.states.idle]: {
-      [timers.actions.onTaskStartRequested]: state => {
-        if (!todos.currentState.currentTodo) {
-          return state;
-        }
-
+    [timers.states.off]: {
+      [timers.actions.onToggleButtonOnTurnedOn]: state => {
         return {
           ...state,
-          type: timers.states.work
+          type: timers.states.work_on
         };
       },
     },
-    [timers.states.work]: {
-      [timers.actions.onWorkDone]: state => ({
-        ...state,
-        type: timers.states.rest
-      }),
-    },
-    [timers.states.rest]: {
-      [timers.actions.onNotAllTodosDone]: state => {
-        if (!todos.currentState.currentTodo) {
-          return state;
-        }
-
+    [timers.states.work_on]: {
+      [timers.actions.onToggleButtonOnTurnedOff]: state => {
         return {
           ...state,
-          type: timers.states.work
+          type: timers.states.work_off
         };
-      },  
-      [timers.actions.onAllTodosDone]: state => ({
+      },
+      [timers.actions.onWorkDone]: state => {
+        return {
           ...state,
-          type: timers.states.idle,
-      }),
-    }
+          type: timers.states.rest_on
+        };
+      },
+    },
+    [timers.states.work_off]: {
+      [timers.actions.onToggleButtonOnTurnedOn]: state => {
+        return {
+          ...state,
+          type: timers.states.work_on
+        };
+      },
+    },
+    [timers.states.rest_on]: {
+      [timers.actions.onToggleButtonOnTurnedOff]: state => {
+        return {
+          ...state,
+          type: timers.states.rest_off
+        };
+      },
+      [timers.actions.onNotAllTodosDone]: state => {
+        return {
+          ...state,
+          type: timers.states.work_on
+        };
+      },
+      [timers.actions.onAllTodosDone]: state => {
+        return {
+          ...state,
+          type: timers.states.off
+        };
+      },
+    },
+    [timers.states.rest_off]: {
+      [timers.actions.onToggleButtonOnTurnedOn]: state => {
+        return {
+          ...state,
+          type: timers.states.rest_on
+        };
+      },
+    },
   }
 );
-
-
-const messages = {
-  actions: {
-    onTaskPauseRequested: "onTaskPauseRequested",
-    onTaskResumeRequested: "onTaskResumeRequested",
-  },
-  states: {
-    pause: "pause",
-    resume: "resume",
-  }
-};
-messages.initialState = {};
-messages.transitions = createReducer(
-  messages.initialState,
-  {
-    [messages.actions.onTaskPauseRequested]: state => ({
-      ...state,
-      type: messages.states.pause
-    }),
-    [messages.actions.onTaskResumeRequested]: state => ({
-      ...state,
-      type: messages.states.resume
-    }),
-  });
 
 
 function Pomodoro() {
   [timers.currentState, timers.dispatch] = useReducer(timers.transitions, timers.initialState);
   [todos.currentState, todos.dispatch] = useReducer(todos.transitions, todos.initialState);
-  [messages.currentState, messages.dispatch] = useReducer(messages.transitions, messages.initialState);
 
   return (
     <>
       <Timer
         title="work"
         duration={8}
-        start={timers.currentState.type === timers.states.work}
-        pause={messages.currentState.type === messages.states.pause}
-        resume={messages.currentState.type === messages.states.resume}
+        pause={timers.currentState.type !== timers.states.work_on}
+        resume={timers.currentState.type === timers.states.work_on}
         onDone={() =>
           timers.dispatch({
             type: timers.actions.onWorkDone
@@ -154,9 +147,8 @@ function Pomodoro() {
       <Timer
         title="rest"
         duration={5}
-        start={timers.currentState.type === timers.states.rest}
-        pause={messages.currentState.type === messages.states.pause}
-        resume={messages.currentState.type === messages.states.resume}
+        pause={timers.currentState.type !== timers.states.rest_on}
+        resume={timers.currentState.type === timers.states.rest_on}
         onDone={() => 
           todos.dispatch({
             type: todos.actions.onRestTimerDone,
@@ -165,21 +157,18 @@ function Pomodoro() {
         }
       />
       <ToggleButton
-        turnOff={timers.currentState.type === timers.states.idle}
+        turnOff={timers.currentState.type === timers.states.off}
         turnOnText={"start"}
         turnOffText={"pause"}
         toggleCondition={todos.currentState.currentTodo}
         onTurnedOn={() => {
           timers.dispatch({
-            type: timers.actions.onTaskStartRequested
-          });
-          messages.dispatch({
-            type: messages.actions.onTaskResumeRequested
+            type: timers.actions.onToggleButtonOnTurnedOn
           });
         }}
         onTurnedOff={() => {
-          messages.dispatch({
-            type: messages.actions.onTaskPauseRequested
+          timers.dispatch({
+            type: timers.actions.onToggleButtonOnTurnedOff
           });
         }}
       />

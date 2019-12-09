@@ -5,48 +5,33 @@ import createReducer from "./createReducer";
 function Timer({
   title,
   duration = 5,
-  start,
   pause,
   resume,
   onDone
 }) {
   const timer = {
     states: {
-      idle: "idle",
       running: "running",
       paused: "paused",
     },
     actions: {
-      onTimerStartRequested: "onTimerStartRequested",
       onTimerPauseRequested: "onTimerPauseRequested",
       onTimerResumeRequested: "onTimerResumeRequested",
       onCounterDone: "onCounterDone",
     }
   };
   timer.initialState = {
-    type: timer.states.idle
+    type: timer.states.paused
   };
   timer.transitions = useReducer(
     createMachine(
       // digraph G {
-      //   "idle" -> "running" [ label="onTimerStartRequested" ]; 
-      //   "running" -> "idle" [ label="stop" ];
       //   "running" -> "paused" [ label="onTimerPauseRequested" ];
       //   "paused" -> "running" [ label="onTimerResumeRequested" ];
       // }
       timer.initialState,
       {
-        [timer.states.idle]: {
-          [timer.actions.onTimerStartRequested]: state => ({
-            ...state,
-            type: timer.states.running
-          }),
-        },
         [timer.states.running]: {
-          [timer.actions.onCounterDone]: state => ({
-            ...state,
-            type: timer.states.idle
-          }),
           [timer.actions.onTimerPauseRequested]: state => ({
             ...state,
             type: timer.states.paused
@@ -117,14 +102,6 @@ function Timer({
       onDone(counter.currentState);
     }
   }, [counter.currentState.count]);
-
-  useEffect(() => {
-    if (start) {
-      timer.dispatch({
-        type: timer.actions.onTimerStartRequested,
-      });
-    }
-  }, [start]);
 
   useEffect(() => {
     if (pause) {

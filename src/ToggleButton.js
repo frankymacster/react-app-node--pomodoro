@@ -61,9 +61,13 @@ function ToggleButton({
   
   useEffect(() => {
     if (toggleButton.currentState.type === toggleButton.states.on) {
-      onTurnedOn();
+      if (onTurnedOn) {
+        onTurnedOn();
+      }
     } else {
-      onTurnedOff();
+      if (onTurnedOff) {
+        onTurnedOff();
+      }
     }
   }, [toggleButton.currentState]);
 
