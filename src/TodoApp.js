@@ -115,7 +115,8 @@ const TodoList = ({
 
 const TodoApp = ({
   doneTodos,
-  onChange
+  onChange,
+  onDeleteTodo
 }) => {
   useEffect(() =>
     dispatch({
@@ -213,12 +214,13 @@ const TodoApp = ({
       />
       <TodoList
         todos={state.todos}
-        deleteTodo={todoIndex =>
+        deleteTodo={todoIndex => {
           dispatch({
             type: "deleteTodo",
             todoIndex
-          })
-        }
+          });
+          onDeleteTodo(state.todos[todoIndex]);
+        }}
         editTodo={todoIndex =>
           dispatch({
             type: "editTodo",

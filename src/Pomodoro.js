@@ -10,7 +10,8 @@ const todos = {
   // states: 0 | 1 | 2 | ...
   actions: {
     onRestTimerDone: "onRestTimerDone",
-    onGotNextTodo: "onGotNextTodo"
+    onGotNextTodo: "onGotNextTodo",
+    onTodoAppDeleteTodo: "onTodoAppDeleteTodo",
   }
 };
 todos.initialState = {
@@ -39,6 +40,10 @@ todos.transitions =
         ...state,
         currentTodo: null
       }),
+      [todos.actions.onTodoAppDeleteTodo]: state => ({
+        ...state,
+        currentTodo: null
+      }),
     }
   );
 
@@ -57,6 +62,7 @@ const timers = {
     onWorkDone: "onWorkDone",
     onAllTodosDone: "onAllTodosDone",
     onNotAllTodosDone: "onNotAllTodosDone",
+    onTodoAppDeleteTodo: "onTodoAppDeleteTodo",
   }
 };
 timers.initialState = {
@@ -86,12 +92,24 @@ timers.transitions = createMachine(
           type: timers.states.rest_on
         };
       },
+      [timers.actions.onTodoAppDeleteTodo]: state => {
+        return {
+          ...state,
+          type: timers.states.off
+        };
+      },
     },
     [timers.states.work_off]: {
       [timers.actions.onToggleButtonOnTurnedOn]: state => {
         return {
           ...state,
           type: timers.states.work_on
+        };
+      },
+      [timers.actions.onTodoAppDeleteTodo]: state => {
+        return {
+          ...state,
+          type: timers.states.off
         };
       },
     },
@@ -114,12 +132,24 @@ timers.transitions = createMachine(
           type: timers.states.off
         };
       },
+      [timers.actions.onTodoAppDeleteTodo]: state => {
+        return {
+          ...state,
+          type: timers.states.off
+        };
+      },
     },
     [timers.states.rest_off]: {
       [timers.actions.onToggleButtonOnTurnedOn]: state => {
         return {
           ...state,
           type: timers.states.rest_on
+        };
+      },
+      [timers.actions.onTodoAppDeleteTodo]: state => {
+        return {
+          ...state,
+          type: timers.states.off
         };
       },
     },
@@ -190,6 +220,16 @@ function Pomodoro() {
           } else {
             timers.dispatch({
               type: timers.actions.onNotAllTodosDone
+            });
+          }
+        }}
+        onDeleteTodo={deletedTodo => {
+          if (deletedTodo.id === todos.currentState.currentTodo.id) {
+            timers.dispatch({
+              type: timers.actions.onTodoAppDeleteTodo
+            });
+            todos.dispatch({
+              type: timers.actions.onTodoAppDeleteTodo
             });
           }
         }}
