@@ -12,6 +12,7 @@ const todos = {
     onRestTimerDone: "onRestTimerDone",
     onGotNextTodo: "onGotNextTodo",
     onTodoAppDeleteTodo: "onTodoAppDeleteTodo",
+    onNotAllTodosDone: "onNotAllTodosDone"
   }
 };
 todos.initialState = {
@@ -166,6 +167,7 @@ function Pomodoro() {
       <Timer
         title="work"
         duration={8}
+        resetCondition={timers.currentState.type === timers.states.work_on}
         pause={timers.currentState.type !== timers.states.work_on}
         resume={timers.currentState.type === timers.states.work_on}
         onDone={() =>
@@ -177,6 +179,7 @@ function Pomodoro() {
       <Timer
         title="rest"
         duration={5}
+        resetCondition={timers.currentState.type === timers.states.work_on}
         pause={timers.currentState.type !== timers.states.rest_on}
         resume={timers.currentState.type === timers.states.rest_on}
         onDone={() => 
@@ -219,6 +222,9 @@ function Pomodoro() {
             });
           } else {
             timers.dispatch({
+              type: timers.actions.onNotAllTodosDone
+            });
+            todos.dispatch({
               type: timers.actions.onNotAllTodosDone
             });
           }

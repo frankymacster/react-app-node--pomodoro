@@ -5,6 +5,7 @@ import createReducer from "./createReducer";
 function Timer({
   title,
   duration = 5,
+  resetCondition,
   pause,
   resume,
   onDone
@@ -55,6 +56,7 @@ function Timer({
     // states: 0 | 1 | 2 | ...
     actions: {
       incrementCount: "incrementCount",
+      onResetCondition: "onResetCondition",
     }
   };
   counter.initialState = {
@@ -67,6 +69,10 @@ function Timer({
         [counter.actions.incrementCount]: state => ({
           ...state,
           count: state.count + 1
+        }),
+        [counter.actions.onResetCondition]: state => ({
+          ...state,
+          count: 0
         }),
       }
     ),
@@ -118,6 +124,14 @@ function Timer({
       });
     }
   }, [resume]);
+
+  useEffect(() => {
+    if (resetCondition) {
+      counter.dispatch({
+        type: counter.actions.onResetCondition,
+      });
+    }
+  }, [resetCondition])
 
   return <h1>{title} {counter.currentState.count}</h1>;
 }
