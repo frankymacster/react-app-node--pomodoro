@@ -4,6 +4,7 @@ import createReducer from "./createReducer";
 import TodoApp from "./TodoApp";
 import Timer from "./Timer";
 import ToggleButton from "./ToggleButton";
+import Form from "./Form";
 
 
 const todos = {
@@ -157,16 +158,54 @@ timers.transitions = createMachine(
   }
 );
 
+const timersDuration = {
+  actions: {
+    onWorkFormValueSubmitted: "onWorkFormValueSubmitted",
+    onRestFormValueSubmitted: "onRestFormValueSubmitted",
+  },
+};
+timersDuration.initialState = {
+  workDuration: 8,
+  restDuration: 5,
+};
+timersDuration.transitions = createReducer(
+  timersDuration.initialState,
+  {
+    [timersDuration.actions.onWorkFormValueSubmitted]: (state, { value }) => {
+      return {
+        ...state,
+        workDuration: value,
+      };
+    },
+    [timersDuration.actions.onRestFormValueSubmitted]: (state, { value }) => {
+      return {
+        ...state,
+        restDuration: value,
+      };
+    },
+  }
+);
+
 
 function Pomodoro() {
   [timers.currentState, timers.dispatch] = useReducer(timers.transitions, timers.initialState);
+  [timersDuration.currentState, timersDuration.dispatch] = useReducer(timersDuration.transitions, timersDuration.initialState);
   [todos.currentState, todos.dispatch] = useReducer(todos.transitions, todos.initialState);
 
   return (
     <>
+      <Form
+        placeholder={"Input work timer duration"}
+        onValueSubmitted={value => {
+          timersDuration.dispatch({
+            type: timersDuration.actions.onWorkFormValueSubmitted,
+            value
+          });
+        }}
+      />
       <Timer
         title="work"
-        duration={8}
+        duration={timersDuration.currentState.workDuration}
         resetCondition={timers.currentState.type === timers.states.work_on}
         pause={timers.currentState.type !== timers.states.work_on}
         resume={timers.currentState.type === timers.states.work_on}
@@ -177,9 +216,41 @@ function Pomodoro() {
         }
       />
       <Timer
+        title="total work"
+        duration={timersDuration.currentState.workDuration}
+        pause={timers.currentState.type !== timers.states.work_on}
+        resume={timers.currentState.type === timers.states.work_on}
+        onDone={() =>
+          timers.dispatch({
+            type: timers.actions.onWorkDone
+          })
+        }
+      />
+      <Form
+        placeholder={"Input rest timer duration"}
+        onValueSubmitted={value => {
+          timersDuration.dispatch({
+            type: timersDuration.actions.onRestFormValueSubmitted,
+            value
+          });
+        }}
+      />
+      <Timer
         title="rest"
-        duration={5}
+        duration={timersDuration.currentState.restDuration}
         resetCondition={timers.currentState.type === timers.states.work_on}
+        pause={timers.currentState.type !== timers.states.rest_on}
+        resume={timers.currentState.type === timers.states.rest_on}
+        onDone={() => 
+          todos.dispatch({
+            type: todos.actions.onRestTimerDone,
+            doneTodo: todos.currentState.currentTodo
+          })
+        }
+      />
+      <Timer
+        title="total rest"
+        duration={timersDuration.currentState.restDuration}
         pause={timers.currentState.type !== timers.states.rest_on}
         resume={timers.currentState.type === timers.states.rest_on}
         onDone={() => 
