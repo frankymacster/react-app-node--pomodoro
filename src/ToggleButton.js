@@ -1,5 +1,6 @@
 import React, { useReducer, useEffect } from "react";
 import createMachine from "./createMachine";
+import Button from '@material-ui/core/Button';
 
 
 const toggleButton = {
@@ -72,7 +73,9 @@ function ToggleButton({
   }, [toggleButton.currentState]);
 
   return (
-    <button
+    <Button
+      variant="contained"
+      color="primary"
       onClick={() => {
         if (toggleCondition) {
           toggleButton.dispatch({
@@ -85,7 +88,7 @@ function ToggleButton({
         ? turnOnText
         : turnOffText
       }
-    </button>
+    </Button>
   );
 }
 
