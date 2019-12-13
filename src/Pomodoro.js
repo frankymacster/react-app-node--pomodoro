@@ -230,7 +230,8 @@ function Pomodoro() {
           }
         }}
         onDeleteTodo={deletedTodo => {
-          if (deletedTodo.id === todos.currentState.currentTodo.id) {
+          if (todos.currentState.currentTodo
+            && todos.currentState.currentTodo.id === deletedTodo.id) {
             timers.dispatch({
               type: timers.actions.onTodoAppDeleteTodo
             });
