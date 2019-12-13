@@ -1,5 +1,4 @@
 import React, { useReducer, useEffect } from 'react';
-import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -9,63 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import createReducer from "./createReducer";
-
-const TodoForm = ({
-  saveTodo
-}) => {
-  const initialState = {
-    value: "",
-    count: 0
-  };
-
-  const reducer = createReducer(
-    initialState,
-    {
-      setValue: (state, { value }) => ({
-        ...state,
-        value
-      }),
-      reset: state => ({
-        ...state,
-        value: ""
-      }),
-      incrementCount: state => ({
-        ...state,
-        count: state.count + 1
-      })
-    }
-  );
-
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  return (
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-
-        saveTodo({
-          id: state.count,
-          text: state.value,
-          editing: false,
-          done: false,
-        });
-        dispatch({ type: "reset" });
-        dispatch({ type: "incrementCount" });
-      }}
-    >
-      <TextField
-        variant="outlined"
-        placeholder="Add todo"
-        margin="normal"
-        value={state.value}
-        onChange={e => dispatch({
-          type: "setValue",
-          value: e.target.value
-        })}
-      />
-    </form>
-  );
-};
+import Form from "./Form";
 
 const TodoList = ({
   todos,
@@ -126,7 +69,10 @@ const TodoApp = ({
     [doneTodos]
   );
 
-  const initialState = { todos: [] };
+  const initialState = {
+    todos: [],
+    count: 0
+  };
 
   const reducer = createReducer(
     initialState,
@@ -189,6 +135,12 @@ const TodoApp = ({
           ...state,
           todos: newTodos
         }
+      },
+      incrementTodoCount: (state) => {
+        return {
+          ...state,
+          count: state.count + 1
+        }
       }
     }
   );
@@ -204,13 +156,22 @@ const TodoApp = ({
 
   return (
     <>
-      <TodoForm
-        saveTodo={todo =>
+      <Form
+        placeholder={"Add todo"}
+        onValueSubmitted={value => {
           dispatch({
             type: "addTodo",
-            todo
-          })
-        }
+            todo: {
+              id: state.count,
+              text: value,
+              editing: false,
+              done: false,
+            }
+          });
+          dispatch({
+            type: "incrementTodoCount"
+          });
+        }}
       />
       <TodoList
         todos={state.todos}
