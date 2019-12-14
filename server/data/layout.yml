@@ -36,3 +36,4 @@
           children:
             - type: Pomodoro
         - type: BFS
+        - type: GraphDrawer

@@ -20,6 +20,7 @@ import Blocks from "./Blocks";
 import Counter from "./Counter";
 import Pomodoro from "./Pomodoro";
 import BFS from "./BFS";
+import GraphDrawer from "./GraphDrawer";
 
 import './App.css';
 
@@ -197,7 +198,10 @@ const DataToComponent = {
   ),
   BFS: () => (
     <BFS />
-  )
+  ),
+  GraphDrawer: () => (
+    <GraphDrawer />
+  ),
 };
 
 function App() {
