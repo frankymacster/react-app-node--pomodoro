@@ -78,6 +78,7 @@ const BFS = () => {
           width: state.width,
           height: state.height,
           "text-align": "left",
+          "background-color": "black",
         }}
         stylesheet={[
           {

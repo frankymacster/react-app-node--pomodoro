@@ -194,13 +194,19 @@ const DataToComponent = {
     />
   ),
   Pomodoro: () => (
-    <Pomodoro />
+    <Card className="media-card">
+      <Pomodoro />
+    </Card>
   ),
   BFS: () => (
-    <BFS />
+    <Card className="media-card">
+      <BFS />
+    </Card>
   ),
   GraphDrawer: () => (
-    <GraphDrawer />
+    <Card className="media-card">
+      <GraphDrawer />
+    </Card>
   ),
 };
 
