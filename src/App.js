@@ -19,6 +19,7 @@ import classList from "./classList";
 import Blocks from "./Blocks";
 import Counter from "./Counter";
 import Pomodoro from "./Pomodoro";
+import BFS from "./BFS";
 
 import './App.css';
 
@@ -191,20 +192,24 @@ const DataToComponent = {
       })}
     />
   ),
-  Pomodoro: ({ params: { state, dispatch } }) => (
+  Pomodoro: () => (
     <Pomodoro />
+  ),
+  BFS: () => (
+    <BFS />
   )
 };
 
 function App() {
   const [data, setData] = useState(null);
 
-  useEffect(() =>
-    (async () => {
+  useEffect(() => {
+    const doEffect = async () => {
       setData(await getData("/api/data"));
-    })
-    ()
-  , []);
+    };
+
+    doEffect();
+  }, []);
 
   return (
     <BrowserRouter>

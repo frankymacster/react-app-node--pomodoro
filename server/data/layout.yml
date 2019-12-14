@@ -35,17 +35,4 @@
         - type: ColumnChildren
           children:
             - type: Pomodoro
-- type: Footer
-  children:
-    - type: Link
-      link: https://www.linkedin.com/in/fran%C3%A7ois-sunatori-52a278a7
-      text: LinkedIn
-    - type: Link
-      link: https://github.com/frankymacster
-      text: GitHub
-    - type: Link
-      link: https://gist.github.com/frankymacster
-      text: gists
-    - type: Link
-      link: https://codepen.io/fsuna064/pens/public?grid_type=list
-      text: CodePen
+        - type: BFS
