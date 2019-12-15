@@ -12,12 +12,6 @@
         - type: MediaCard
           title: Interests
           text: I enjoy working on challenging problems. I like problems involving math and functional programming.
-        - type: Button
-          text: Click here
-          link: http://www.google.com/
-        - type: Button
-          text: Click here
-          link: http://www.facebook.com/
     - type: RowChildren
       title: "Projects"
       route: "/projects"
@@ -26,12 +20,6 @@
           title: Stingray Hackathon WebVR
           codelink: https://github.com/frankymacster/vr-music-player
           demolink: https://stingray-hackathon-webvr.glitch.me
-        - type: MediaCard
-          title: Graph Proof Visualizer
-          codelink: https://github.com/frankymacster/p5js-graph
-        - type: MediaCard
-          title: ECS Panoramic Viewer
-          codelink: https://github.com/frankymacster/ECS-Panoramic-Viewer
         - type: ColumnChildren
           children:
             - type: Pomodoro
