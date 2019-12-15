@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "4.7.0",
+    "@material-ui/icons": "3.0.1",
     "cytoscape": "3.12.1",
     "cytoscape-cose-bilkent": "4.1.0",
     "cytoscape-edgehandles": "3.6.0",
@@ -10,20 +12,18 @@
     "express-prom-bundle": "^5.0.2",
     "isomorphic-unfetch": "3.0.0",
     "js-yaml": "3.13.1",
+    "material-ui": "0.20.2",
     "prom-client": "^11.2.1",
+    "ramda": "0.26.1",
     "react": "16.8.6",
     "react-cytoscapejs": "1.2.1",
     "react-dom": "16.8.6",
     "react-redux": "7.0.3",
     "react-router": "5.0.0",
+    "react-router-dom": "5.1.2",
     "react-scripts": "3.0.1",
     "redux": "4.0.1",
-    "redux-saga": "1.0.2",
-    "react-router-dom": "5.1.2",
-    "ramda": "0.26.1",
-    "material-ui": "0.20.2",
-    "@material-ui/core": "4.7.0",
-    "@material-ui/icons": "3.0.1"
+    "redux-saga": "1.0.2"
   },
   "devDependencies": {
     "nodemon": "1.19.1",
