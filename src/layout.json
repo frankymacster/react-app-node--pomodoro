@@ -46,9 +46,6 @@
             ]
           },
           {
-            "type": "BFS"
-          },
-          {
             "type": "GraphDrawer"
           }
         ]
