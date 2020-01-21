@@ -193,7 +193,6 @@ const DataToComponent = {
       <BFS />
     </Card>
   ),
-  // TODO make BFS happen here when user clicks button
   GraphDrawer: () => (
     <Card className="media-card">
       <GraphDrawer />
