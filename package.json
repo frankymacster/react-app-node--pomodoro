@@ -33,12 +33,8 @@
   },
   "scripts": {
     "build": "react-scripts build",
-    "dev": "run-p dev-backend dev-frontend",
-    "dev-backend": "nodemon --watch server server/app.js",
-    "dev-frontend": "react-scripts start",
-    "start": "node server/app.js",
-    "test": "run-s test-backend test-frontend",
-    "test-backend": "jest server/*",
+    "dev": "react-scripts start",
+    "test": "run test-frontend",
     "test-frontend": "CI=true react-scripts test"
   },
   "eslintConfig": {

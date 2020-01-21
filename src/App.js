@@ -17,8 +17,7 @@ import Counter from "./Counter";
 import Pomodoro from "./Pomodoro";
 import BFS from "./BFS";
 import GraphDrawer from "./GraphDrawer";
-import layout from "./layout.yml";
-import jsyaml from "js-yaml";
+import data from "./layout.json";
 
 import "./App.css";
 
@@ -200,12 +199,6 @@ const DataToComponent = {
 };
 
 function App() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    setData(jsyaml.load(layout));
-  }, []);
-
   return (
     <BrowserRouter>
       <div className="App">
