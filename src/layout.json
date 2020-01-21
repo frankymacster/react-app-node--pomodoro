@@ -35,6 +35,9 @@
             "demolink": "https://stingray-hackathon-webvr.glitch.me"
           },
           {
+            "type": "WidgetAdder"
+          },
+          {
             "type": "ColumnChildren",
             "children": [
               {

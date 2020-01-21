@@ -17,7 +17,7 @@ import Counter from "./Counter";
 import Pomodoro from "./Pomodoro";
 import BFS from "./BFS";
 import GraphDrawer from "./GraphDrawer";
-import data from "./layout.json";
+import layout from "./layout.json";
 
 import "./App.css";
 
@@ -42,6 +42,7 @@ const DataToComponent = {
       </Switch>
     </>
   ),
+  // TODO add pages
   Header: ({ root, key, params: { location } }) => (
     <AppBar
       showMenuIconButton={false}
@@ -181,6 +182,7 @@ const DataToComponent = {
       }
     />
   ),
+  // TODO make multiple Pomodoro widgets work
   Pomodoro: () => (
     <Card className="media-card">
       <Pomodoro />
@@ -191,14 +193,40 @@ const DataToComponent = {
       <BFS />
     </Card>
   ),
+  // TODO make BFS happen here when user clicks button
   GraphDrawer: () => (
     <Card className="media-card">
       <GraphDrawer />
     </Card>
-  )
+  ),
+  WidgetAdder: ({ params: { data, setData } }) => (
+    <Card className="media-card">
+      {["GraphDrawer", "Pomodoro"].map(widget => (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              // TODO Blocks should keep track of where we are in the tree
+              data[0].children[1].children.push({
+                type: widget
+              })
+              setData([
+                ...data
+              ])
+            }}
+          >
+            {`Add ${widget}`} 
+          </Button>
+        )
+      )}
+      
+    </Card>
+  ),
 };
 
 function App() {
+  const [data, setData] = useState(layout)
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -211,7 +239,9 @@ function App() {
                   dataToComponent={DataToComponent}
                   root={data}
                   params={{
-                    location
+                    location,
+                    data,
+                    setData,
                   }}
                 />
               )}
