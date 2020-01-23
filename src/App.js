@@ -22,26 +22,30 @@ import layout from "./layout.json";
 import "./App.css";
 
 const DataToComponent = {
-  Pages: ({ root, key, params }) => (
-    <>
-      {DataToComponent.Header({ root, key, params })}
-      <Switch>
-        {root &&
-          root.children.map(page => (
-            <Route
-              path={page.route}
-              render={() => (
-                <Blocks
-                  root={[page]}
-                  dataToComponent={DataToComponent}
-                  params={params}
-                />
-              )}
-            />
-          ))}
-      </Switch>
-    </>
-  ),
+  Pages: ({ root, key, params, params: { location, setCurrentPage } }) => {
+    setCurrentPage(root.children.find(page => location.pathname === page.route))
+
+    return (
+      <>
+        {DataToComponent.Header({ root, key, params })}
+        <Switch>
+          {root &&
+            root.children.map(page => (
+              <Route
+                path={page.route}
+                render={() => (
+                  <Blocks
+                    root={[page]}
+                    dataToComponent={DataToComponent}
+                    params={params}
+                  />
+                )}
+              />
+            ))}
+        </Switch>
+      </>
+    )
+  },
   // TODO add pages
   Header: ({ root, key, params: { location } }) => (
     <AppBar
@@ -201,35 +205,37 @@ const DataToComponent = {
       <GraphDrawer />
     </Card>
   ),
-  WidgetAdder: ({ root: { widgets }, params: { data, setData } }) => (
-    <Card className="media-card">
-      {widgets.map(widget => (
-        <div>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              // TODO Blocks should keep track of where we are in the tree
-              data[0].children[0].children.push({
-                type: widget
-              })
-              setData([
-                ...data
-              ])
-            }}
-          >
-            {`${widget} +`} 
-          </Button>
-        </div>
-        )
-      )}
-      
-    </Card>
-  ),
+  WidgetAdder: ({ root: { widgets }, params: { data, setData, currentPage } }) => {
+    return (
+      <Card className="media-card">
+        {widgets.map(widget => (
+          <div>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                currentPage && currentPage.children.push({
+                  type: widget
+                })
+                setData([
+                  ...data
+                ])
+              }}
+            >
+              {`${widget} +`} 
+            </Button>
+          </div>
+          )
+        )}
+        
+      </Card>
+    )
+  },  
 };
 
 function App() {
   const [data, setData] = useState(layout)
+  const [currentPage, setCurrentPage] = useState(null)
 
   return (
     <BrowserRouter>
@@ -246,6 +252,8 @@ function App() {
                     location,
                     data,
                     setData,
+                    currentPage,
+                    setCurrentPage,
                   }}
                 />
               )}
