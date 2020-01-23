@@ -58,13 +58,16 @@ const DataToComponent = {
           ))}
         </Tabs>
       ))(location)}
-      style={{ background: "#1AB394" }}
+      style={{ background: "#333" }}
       iconClassNameRight="muidocs-icon-navigation-expand-more"
     />
   ),
   Footer: ({ root, key, params }) => {
     return (
-      <AppBar position="absolute" className="footer" showMenuIconButton={false}>
+      <AppBar
+        position="absolute"
+        className="footer"
+        showMenuIconButton={false}>
         <Toolbar>
           <Blocks
             key={key}
@@ -198,15 +201,16 @@ const DataToComponent = {
       <GraphDrawer />
     </Card>
   ),
-  WidgetAdder: ({ params: { data, setData } }) => (
+  WidgetAdder: ({ root: { widgets }, params: { data, setData } }) => (
     <Card className="media-card">
-      {["GraphDrawer", "Pomodoro"].map(widget => (
+      {widgets.map(widget => (
+        <div>
           <Button
             variant="outlined"
             color="primary"
             onClick={() => {
               // TODO Blocks should keep track of where we are in the tree
-              data[0].children[1].children.push({
+              data[0].children[0].children.push({
                 type: widget
               })
               setData([
@@ -214,8 +218,9 @@ const DataToComponent = {
               ])
             }}
           >
-            {`Add ${widget}`} 
+            {`${widget} +`} 
           </Button>
+        </div>
         )
       )}
       
