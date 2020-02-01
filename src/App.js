@@ -47,21 +47,43 @@ const DataToComponent = {
       </>
     )
   },
-  // TODO add pages
-  Header: ({ root, key, params: { location } }) => (
+  Header: ({ root, params: { location, data, setData, lastAddedPageId, setLastAddedPageId } }) => (
     <AppBar
       showMenuIconButton={false}
       title={(location => (
-        <Tabs className="container" value={location.pathname}>
-          {root.children.map(page => (
-            <Tab
-              className="tab"
-              label={page.title}
-              component={Link}
-              to={page.route}
-            />
-          ))}
-        </Tabs>
+        <>
+          <Tabs className="container" value={location.pathname}>
+            {root.children.map(page => (
+              <Tab
+                className="tab"
+                label={page.title}
+                component={Link}
+                to={page.route}
+              />
+            ))}
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                root && root.children.push({
+                  type: "RowChildren",
+                  children: [{
+                    "type": "WidgetAdder",
+                    "widgets": ["GraphDrawer", "Pomodoro", "Plot"]
+                  }],
+                  title: "Page" + lastAddedPageId,
+                  route: "/page" + lastAddedPageId,
+                })
+                setData([
+                  ...data
+                ])
+                setLastAddedPageId(lastAddedPageId + 1)
+              }}
+            >
+              {` + page`} 
+            </Button>
+          </Tabs>
+        </>
       ))(location)}
       style={{ background: "#333" }}
       iconClassNameRight="muidocs-icon-navigation-expand-more"
@@ -254,6 +276,7 @@ const DataToComponent = {
 function App() {
   const [data, setData] = useState(layout)
   const [currentPage, setCurrentPage] = useState(null)
+  const [lastAddedPageId, setLastAddedPageId] = useState(2)
 
   return (
     <BrowserRouter>
@@ -272,6 +295,8 @@ function App() {
                     setData,
                     currentPage,
                     setCurrentPage,
+                    lastAddedPageId,
+                    setLastAddedPageId
                   }}
                 />
               )}

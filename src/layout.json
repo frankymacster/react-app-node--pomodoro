@@ -4,26 +4,12 @@
     "children": [
       {
         "type": "RowChildren",
-        "title": "Projects",
-        "route": "/projects",
+        "title": "Page1",
+        "route": "/page1",
         "children": [
           {
             "type": "WidgetAdder",
-            "widgets": ["GraphDrawer", "Pomodoro"]
-          },
-          {
-            "type": "ColumnChildren",
-            "children": [
-              {
-                "type": "Pomodoro"
-              }
-            ]
-          },
-          {
-            "type": "GraphDrawer"
-          },
-          {
-            "type": "Plot"
+            "widgets": ["GraphDrawer", "Pomodoro", "Plot"]
           }
         ]
       }
