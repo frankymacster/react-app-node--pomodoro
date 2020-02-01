@@ -119,7 +119,7 @@ const GraphDrawer = () => {
               }
             },
             {
-              selector: '.edge',
+              selector: 'edge',
               style: {
                 'curve-style': 'bezier',
                 'target-arrow-shape': 'triangle',
