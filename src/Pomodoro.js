@@ -48,10 +48,17 @@ todos.transitions =
         ...state,
         currentTodo: null
       }),
-      [actions.todoDeleted]: state => ({
-        ...state,
-        currentTodo: null
-      }),
+      [actions.todoDeleted]: (state, action) => {
+        if (state.todos.currentTodo
+          && state.todos.currentTodo.id === action.deletedTodo.id) {
+          return state
+        }
+
+        return {
+          ...state,
+          currentTodo: null
+        }
+      },
     }
   );
 
@@ -276,12 +283,10 @@ function Pomodoro() {
           })
         }}
         onDeleteTodo={deletedTodo => {
-          if (currentState.todos.currentTodo
-            && currentState.todos.currentTodo.id === deletedTodo.id) {
-            dispatch({
-              type: actions.todoDeleted
-            })
-          }
+          dispatch({
+            type: actions.todoDeleted,
+            deletedTodo
+          })
         }}
       />
     </>
