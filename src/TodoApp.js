@@ -58,8 +58,9 @@ const TodoList = ({
 
 const TodoApp = ({
   finishedTodos,
-  onChange,
-  onDeleteTodo
+  onCurrentTodoFinished,
+  onDeleteTodo,
+  onAllTodosFinished
 }) => {
   useEffect(() =>
     dispatch({
@@ -149,7 +150,11 @@ const TodoApp = ({
 
   useEffect(
     () => {
-      onChange(state.todos);
+      if (state.todos.every(todo => todo.done === true)) {
+        onAllTodosFinished && onAllTodosFinished(state.todos);
+      } else {
+        onCurrentTodoFinished && onCurrentTodoFinished(state.todos);
+      }
     },
     [state.todos]
   );

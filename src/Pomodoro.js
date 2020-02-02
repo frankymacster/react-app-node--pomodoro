@@ -11,15 +11,12 @@ import Form from "./Form";
 
 const actions = {
   restTimerFinished: "restTimerFinished",
-  nextTodoReceived: "nextTodoReceived",
-  todoDeleted: "todoDeleted",
   currentTodoFinished: "currentTodoFinished",
+  todoDeleted: "todoDeleted",
   toggleButtonTurnedOn: "toggleButtonTurnedOn",
   toggleButtonTurnedOff: "toggleButtonTurnedOff",
   workTimerFinished: "workTimerFinished",
   allTodosFinished: "allTodosFinished",
-  currentTodoFinished: "currentTodoFinished",
-  todoDeleted: "todoDeleted",
   workFormSubmitted: "workFormSubmitted",
   restFormSubmitted: "restFormSubmitted",
 }
@@ -37,7 +34,7 @@ todos.transitions =
         ...state,
         finishedTodos: [ ...state.finishedTodos, action.finishedTodo ]
       }),
-      [actions.nextTodoReceived]: (state, action) => {
+      [actions.currentTodoFinished]: (state, action) => {
         if (!action.currentTodo) {
           return state;
         }
@@ -267,22 +264,16 @@ function Pomodoro() {
       />
       <TodoApp
         finishedTodos={currentState.todos.finishedTodos}
-        // TODO separate this callback
-        onChange={ts => {
+        onCurrentTodoFinished={ts => {
           dispatch({
-            type: actions.nextTodoReceived,
+            type: actions.currentTodoFinished,
             currentTodo: ts.filter(todo => !todo.done)[0] || null
-          });
-
-          if (ts.every(todo => todo.done === true)) {
-            dispatch({
-              type: actions.allTodosFinished
-            })
-          } else {
-            dispatch({
-              type: actions.currentTodoFinished
-            })
-          }
+          })
+        }}
+        onAllTodosFinished={() => {
+          dispatch({
+            type: actions.allTodosFinished
+          })
         }}
         onDeleteTodo={deletedTodo => {
           if (currentState.todos.currentTodo
