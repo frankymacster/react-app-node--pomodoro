@@ -8,7 +8,7 @@ function Timer({
   resetCondition,
   pause,
   resume,
-  onDone
+  onFinished
 }) {
   const timer = {
     states: {
@@ -105,7 +105,7 @@ function Timer({
       timer.dispatch({
         type: timer.actions.onCounterDone,
       });
-      onDone(counter.currentState);
+      onFinished && onFinished(counter.currentState);
     }
   }, [counter.currentState.count]);
 

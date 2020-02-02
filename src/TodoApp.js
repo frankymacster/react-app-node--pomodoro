@@ -57,16 +57,16 @@ const TodoList = ({
 );
 
 const TodoApp = ({
-  doneTodos,
+  finishedTodos,
   onChange,
   onDeleteTodo
 }) => {
   useEffect(() =>
     dispatch({
-      type: "setDoneTodos",
-      doneTodos
+      type: "setfinishedTodos",
+      finishedTodos
     }),
-    [doneTodos]
+    [finishedTodos]
   );
 
   const initialState = {
@@ -119,9 +119,9 @@ const TodoApp = ({
           todos: newTodos
         }
       },
-      setDoneTodos: (state, action) => {
+      setfinishedTodos: (state, action) => {
         const newTodos = state.todos.reduce((accumulator, currentValue) => {
-          if (action.doneTodos.some(todo => todo.id === currentValue.id)) {
+          if (action.finishedTodos.some(todo => todo.id === currentValue.id)) {
             return accumulator.concat([{
               ...currentValue,
               done: true

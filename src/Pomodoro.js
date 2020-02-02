@@ -8,27 +8,26 @@ import Form from "./Form";
 
 
 const todos = {
-  // states: 0 | 1 | 2 | ...
   actions: {
-    onRestTimerDone: "onRestTimerDone",
-    onGotNextTodo: "onGotNextTodo",
-    onTodoAppDeleteTodo: "onTodoAppDeleteTodo",
-    onNotAllTodosDone: "onNotAllTodosDone"
+    restTimerFinished: "restTimerFinished",
+    nextTodoReceived: "nextTodoReceived",
+    todoDeleted: "todoDeleted",
+    currentTodoFinished: "currentTodoFinished"
   }
 };
 todos.initialState = {
-  doneTodos: [],
+  finishedTodos: [],
   currentTodo: null
 };
 todos.transitions =
   createReducer(
     todos.initialState,
     {
-      [todos.actions.onRestTimerDone]: (state, action) => ({
+      [todos.actions.restTimerFinished]: (state, action) => ({
         ...state,
-        doneTodos: [ ...state.doneTodos, action.doneTodo ]
+        finishedTodos: [ ...state.finishedTodos, action.finishedTodo ]
       }),
-      [todos.actions.onGotNextTodo]: (state, action) => {
+      [todos.actions.nextTodoReceived]: (state, action) => {
         if (!action.currentTodo) {
           return state;
         }
@@ -38,11 +37,11 @@ todos.transitions =
           currentTodo: action.currentTodo
         }
       },
-      [todos.actions.onAllTodosDone]: state => ({
+      [todos.actions.allTodosFinished]: state => ({
         ...state,
         currentTodo: null
       }),
-      [todos.actions.onTodoAppDeleteTodo]: state => ({
+      [todos.actions.todoDeleted]: state => ({
         ...state,
         currentTodo: null
       }),
@@ -59,12 +58,12 @@ const timers = {
     rest_off: "rest_off",
   },
   actions: {
-    onToggleButtonOnTurnedOn: "onToggleButtonOnTurnedOn",
-    onToggleButtonOnTurnedOff: "onToggleButtonOnTurnedOff",
-    onWorkDone: "onWorkDone",
-    onAllTodosDone: "onAllTodosDone",
-    onNotAllTodosDone: "onNotAllTodosDone",
-    onTodoAppDeleteTodo: "onTodoAppDeleteTodo",
+    toggleButtonTurnedOn: "toggleButtonTurnedOn",
+    toggleButtonTurnedOff: "toggleButtonTurnedOff",
+    workTimerFinished: "workTimerFinished",
+    allTodosFinished: "allTodosFinished",
+    currentTodoFinished: "currentTodoFinished",
+    todoDeleted: "todoDeleted",
   }
 };
 timers.initialState = {
@@ -74,7 +73,7 @@ timers.transitions = createMachine(
   timers.initialState,
   {
     [timers.states.off]: {
-      [timers.actions.onToggleButtonOnTurnedOn]: state => {
+      [timers.actions.toggleButtonTurnedOn]: state => {
         return {
           ...state,
           type: timers.states.work_on
@@ -82,19 +81,19 @@ timers.transitions = createMachine(
       },
     },
     [timers.states.work_on]: {
-      [timers.actions.onToggleButtonOnTurnedOff]: state => {
+      [timers.actions.toggleButtonTurnedOff]: state => {
         return {
           ...state,
           type: timers.states.work_off
         };
       },
-      [timers.actions.onWorkDone]: state => {
+      [timers.actions.workTimerFinished]: state => {
         return {
           ...state,
           type: timers.states.rest_on
         };
       },
-      [timers.actions.onTodoAppDeleteTodo]: state => {
+      [timers.actions.todoDeleted]: state => {
         return {
           ...state,
           type: timers.states.off
@@ -102,13 +101,13 @@ timers.transitions = createMachine(
       },
     },
     [timers.states.work_off]: {
-      [timers.actions.onToggleButtonOnTurnedOn]: state => {
+      [timers.actions.toggleButtonTurnedOn]: state => {
         return {
           ...state,
           type: timers.states.work_on
         };
       },
-      [timers.actions.onTodoAppDeleteTodo]: state => {
+      [timers.actions.todoDeleted]: state => {
         return {
           ...state,
           type: timers.states.off
@@ -116,25 +115,25 @@ timers.transitions = createMachine(
       },
     },
     [timers.states.rest_on]: {
-      [timers.actions.onToggleButtonOnTurnedOff]: state => {
+      [timers.actions.toggleButtonTurnedOff]: state => {
         return {
           ...state,
           type: timers.states.rest_off
         };
       },
-      [timers.actions.onNotAllTodosDone]: state => {
+      [timers.actions.currentTodoFinished]: state => {
         return {
           ...state,
           type: timers.states.work_on
         };
       },
-      [timers.actions.onAllTodosDone]: state => {
+      [timers.actions.allTodosFinished]: state => {
         return {
           ...state,
           type: timers.states.off
         };
       },
-      [timers.actions.onTodoAppDeleteTodo]: state => {
+      [timers.actions.todoDeleted]: state => {
         return {
           ...state,
           type: timers.states.off
@@ -142,13 +141,13 @@ timers.transitions = createMachine(
       },
     },
     [timers.states.rest_off]: {
-      [timers.actions.onToggleButtonOnTurnedOn]: state => {
+      [timers.actions.toggleButtonTurnedOn]: state => {
         return {
           ...state,
           type: timers.states.rest_on
         };
       },
-      [timers.actions.onTodoAppDeleteTodo]: state => {
+      [timers.actions.todoDeleted]: state => {
         return {
           ...state,
           type: timers.states.off
@@ -158,26 +157,26 @@ timers.transitions = createMachine(
   }
 );
 
-const timersDuration = {
+const forms = {
   actions: {
-    onWorkFormValueSubmitted: "onWorkFormValueSubmitted",
-    onRestFormValueSubmitted: "onRestFormValueSubmitted",
+    workFormSubmitted: "workFormSubmitted",
+    restFormSubmitted: "restFormSubmitted",
   },
 };
-timersDuration.initialState = {
+forms.initialState = {
   workDuration: 8,
   restDuration: 5,
 };
-timersDuration.transitions = createReducer(
-  timersDuration.initialState,
+forms.transitions = createReducer(
+  forms.initialState,
   {
-    [timersDuration.actions.onWorkFormValueSubmitted]: (state, { value }) => {
+    [forms.actions.workFormSubmitted]: (state, { value }) => {
       return {
         ...state,
         workDuration: value,
       };
     },
-    [timersDuration.actions.onRestFormValueSubmitted]: (state, { value }) => {
+    [forms.actions.restFormSubmitted]: (state, { value }) => {
       return {
         ...state,
         restDuration: value,
@@ -189,7 +188,7 @@ timersDuration.transitions = createReducer(
 
 function Pomodoro() {
   [timers.currentState, timers.dispatch] = useReducer(timers.transitions, timers.initialState);
-  [timersDuration.currentState, timersDuration.dispatch] = useReducer(timersDuration.transitions, timersDuration.initialState);
+  [forms.currentState, forms.dispatch] = useReducer(forms.transitions, forms.initialState);
   [todos.currentState, todos.dispatch] = useReducer(todos.transitions, todos.initialState);
 
   return (
@@ -197,68 +196,57 @@ function Pomodoro() {
       <Form
         placeholder={"Input work timer duration"}
         onValueSubmitted={value => {
-          timersDuration.dispatch({
-            type: timersDuration.actions.onWorkFormValueSubmitted,
+          forms.dispatch({
+            type: forms.actions.workFormSubmitted,
             value
           });
         }}
       />
       <Timer
         title="work"
-        duration={timersDuration.currentState.workDuration}
+        duration={forms.currentState.workDuration}
         resetCondition={timers.currentState.type === timers.states.work_on}
         pause={timers.currentState.type !== timers.states.work_on}
         resume={timers.currentState.type === timers.states.work_on}
-        onDone={() =>
+        onFinished={() =>
           timers.dispatch({
-            type: timers.actions.onWorkDone
+            type: timers.actions.workTimerFinished
           })
         }
       />
       <Timer
         title="total work"
-        duration={timersDuration.currentState.workDuration}
+        duration={forms.currentState.workDuration}
         pause={timers.currentState.type !== timers.states.work_on}
         resume={timers.currentState.type === timers.states.work_on}
-        onDone={() =>
-          timers.dispatch({
-            type: timers.actions.onWorkDone
-          })
-        }
       />
       <Form
         placeholder={"Input rest timer duration"}
         onValueSubmitted={value => {
-          timersDuration.dispatch({
-            type: timersDuration.actions.onRestFormValueSubmitted,
+          forms.dispatch({
+            type: forms.actions.restFormSubmitted,
             value
           });
         }}
       />
       <Timer
         title="rest"
-        duration={timersDuration.currentState.restDuration}
+        duration={forms.currentState.restDuration}
         resetCondition={timers.currentState.type === timers.states.work_on}
         pause={timers.currentState.type !== timers.states.rest_on}
         resume={timers.currentState.type === timers.states.rest_on}
-        onDone={() => 
+        onFinished={() => 
           todos.dispatch({
-            type: todos.actions.onRestTimerDone,
-            doneTodo: todos.currentState.currentTodo
+            type: todos.actions.restTimerFinished,
+            finishedTodo: todos.currentState.currentTodo
           })
         }
       />
       <Timer
         title="total rest"
-        duration={timersDuration.currentState.restDuration}
+        duration={forms.currentState.restDuration}
         pause={timers.currentState.type !== timers.states.rest_on}
         resume={timers.currentState.type === timers.states.rest_on}
-        onDone={() => 
-          todos.dispatch({
-            type: todos.actions.onRestTimerDone,
-            doneTodo: todos.currentState.currentTodo
-          })
-        }
       />
       <ToggleButton
         turnOff={timers.currentState.type === timers.states.off}
@@ -267,36 +255,36 @@ function Pomodoro() {
         toggleCondition={todos.currentState.currentTodo}
         onTurnedOn={() => {
           timers.dispatch({
-            type: timers.actions.onToggleButtonOnTurnedOn
+            type: timers.actions.toggleButtonTurnedOn
           });
         }}
         onTurnedOff={() => {
           timers.dispatch({
-            type: timers.actions.onToggleButtonOnTurnedOff
+            type: timers.actions.toggleButtonTurnedOff
           });
         }}
       />
       <TodoApp
-        doneTodos={todos.currentState.doneTodos}
+        finishedTodos={todos.currentState.finishedTodos}
         onChange={ts => {
           todos.dispatch({
-            type: todos.actions.onGotNextTodo,
+            type: todos.actions.nextTodoReceived,
             currentTodo: ts.filter(todo => !todo.done)[0] || null
           });
 
           if (ts.every(todo => todo.done === true)) {
             timers.dispatch({
-              type: timers.actions.onAllTodosDone
+              type: timers.actions.allTodosFinished
             });
             todos.dispatch({
-              type: todos.actions.onAllTodosDone
+              type: todos.actions.allTodosFinished
             });
           } else {
             timers.dispatch({
-              type: timers.actions.onNotAllTodosDone
+              type: timers.actions.currentTodoFinished
             });
             todos.dispatch({
-              type: timers.actions.onNotAllTodosDone
+              type: timers.actions.currentTodoFinished
             });
           }
         }}
@@ -304,10 +292,10 @@ function Pomodoro() {
           if (todos.currentState.currentTodo
             && todos.currentState.currentTodo.id === deletedTodo.id) {
             timers.dispatch({
-              type: timers.actions.onTodoAppDeleteTodo
+              type: timers.actions.todoDeleted
             });
             todos.dispatch({
-              type: timers.actions.onTodoAppDeleteTodo
+              type: timers.actions.todoDeleted
             });
           }
         }}
