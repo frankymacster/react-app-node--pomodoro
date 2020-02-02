@@ -11,14 +11,14 @@ import Form from "./Form";
 
 const actions = {
   restTimerFinished: "restTimerFinished",
+  workTimerFinished: "workTimerFinished",
+  restFormSubmitted: "restFormSubmitted",
+  workFormSubmitted: "workFormSubmitted",
   currentTodoFinished: "currentTodoFinished",
+  allTodosFinished: "allTodosFinished",
   todoDeleted: "todoDeleted",
   toggleButtonTurnedOn: "toggleButtonTurnedOn",
   toggleButtonTurnedOff: "toggleButtonTurnedOff",
-  workTimerFinished: "workTimerFinished",
-  allTodosFinished: "allTodosFinished",
-  workFormSubmitted: "workFormSubmitted",
-  restFormSubmitted: "restFormSubmitted",
 }
 
 const todos = {};
