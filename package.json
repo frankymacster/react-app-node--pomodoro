@@ -8,7 +8,7 @@
     "cytoscape": "3.12.1",
     "cytoscape-cose-bilkent": "4.1.0",
     "cytoscape-edgehandles": "3.6.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "express-prom-bundle": "^5.0.2",
     "isomorphic-unfetch": "3.0.0",
     "js-yaml": "3.13.1",
